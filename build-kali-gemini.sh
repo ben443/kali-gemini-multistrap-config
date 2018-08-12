@@ -5,24 +5,27 @@ SYS_IMG_FILE=system.img
 ROOT_IMG_FILE=linux_root.img
 DEBUG=1
 
+#WHICH PARTS TO EXECUTE ( 0=Don't execute
+#                         1=Execute
+#                         2=Ask )
+PURGE=2
+CLEANUP=2
+PREPARE=2
+WRITEMULTISTRAPCFG=2
+MULTISTRAP=2
+ADDQEMU=2
+WRITEPOSTSETUP=2
+WRITEROOTFSCFG=2
+POSTSETUP=2
+REMOVEQEMU=2
+PREPAREIMG=2
+CREATEIMG=2
 
-#WHICH PARTS TO EXECUTE:
-PURGE=1
-PREPARE=1
-WRITEMULTISTRAPCFG=1
-MULTISTRAP=1
-ADDQEMU=1
-WRITEPOSTSETUP=1
-WRITEROOTFSCFG=1
-POSTSETUP=1
-REMOVEQEMU=1
-PREPAREIMG=1
-CREATEIMG=1
-CLEANUP=1
+# Packages to install
 KALI_KALI="kali-defaults kali-menu desktop-base kali-linux-top10 kali-root-login firmware-realtek firmware-atheros firmware-libertas"
-KALI_GENERIC="task-lxqt-desktop ark bash-completion bluez breeze bzip2 chromium dosfstools exfat-utils file fonts-hack-ttf fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-mono gdisk gstreamer1.0-plugins-base gtk3-engines-breeze gvfs-backends hunspell-en-us hyphen-en-us isc-dhcp-common iw kate kcharselect kde-style-breeze-qt4 kdelibs5-data kpackagelauncherqml kwin-x11 libfm-qt-l10n libglib2.0-data libkf5config-bin libkf5dbusaddons-bin libkf5globalaccel-bin libkf5iconthemes-bin libkf5xmlgui-bin libqt5core5a libqt5dbus5 libqt5gui5 libqt5widgets5 libqt5x11extras5 libqtermwidget5-0 libqt5xml5 liblxqt-l10n libvlc-bin locales lxc lximage-qt lximage-qt-l10n lxqt-about-l10n lxqt-admin-l10n lxqt-config-l10n lxqt-globalkeys-l10n lxqt-notificationd-l10n lxqt-openssh-askpass-l10n lxqt-panel-l10n lxqt-policykit-l10n lxqt-powermanagement-l10n lxqt-runner-l10n lxqt-session-l10n lxqt-sudo lxqt-sudo-l10n mythes-en-us ncurses-term net-tools ntfs-3g p7zip-full pavucontrol-qt pavucontrol-qt-l10n pcmanfm-qt-l10n policykit-1 psmisc qlipper qpdfview qpdfview-djvu-plugin qpdfview-ps-plugin qpdfview-translations qt5-gtk-platformtheme qt5-image-formats-plugins qterminal qterminal-l10n qttranslations5-l10n rename rsync rtkit saytime smplayer smplayer-l10n smplayer-themes ssh sudo unzip upower wget wpasupplicant xdg-user-dirs xdg-utils xz-utils youtube-dl"
+KALI_GENERIC="task-lxqt-desktop ark bash-completion bluez breeze bzip2 chromium dosfstools exfat-utils file fonts-hack-ttf fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-mono gdisk gstreamer1.0-plugins-base gtk3-engines-breeze gvfs-backends hunspell-en-us hyphen-en-us isc-dhcp-common iw kate kcharselect kde-style-breeze-qt4 kdelibs5-data kpackagelauncherqml kwin-x11 libfm-qt-l10n libglib2.0-data libkf5config-bin libkf5dbusaddons-bin libkf5globalaccel-bin libkf5iconthemes-bin libkf5xmlgui-bin liblxqt-l10n libvlc-bin locales lxc lximage-qt lximage-qt-l10n lxqt-about-l10n lxqt-admin-l10n lxqt-config-l10n lxqt-globalkeys-l10n lxqt-notificationd-l10n lxqt-openssh-askpass-l10n lxqt-panel-l10n lxqt-policykit-l10n lxqt-powermanagement-l10n lxqt-runner-l10n lxqt-session-l10n lxqt-sudo lxqt-sudo-l10n mythes-en-us ncurses-term net-tools ntfs-3g p7zip-full pavucontrol-qt pavucontrol-qt-l10n pcmanfm-qt-l10n policykit-1 psmisc qlipper qpdfview qpdfview-djvu-plugin qpdfview-ps-plugin qpdfview-translations qt5-gtk-platformtheme qt5-image-formats-plugins qterminal qterminal-l10n qttranslations5-l10n rename rsync rtkit saytime smplayer smplayer-l10n smplayer-themes ssh sudo unzip upower wget wpasupplicant xdg-user-dirs xdg-utils xz-utils youtube-dl"
 KALI_PACKAGES="${KALI_KALI} ${KALI_GENERIC}"
-GEMIAN_PACKAGES="hybris-usb lxc-android libhybris drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid ofono repowerd xss-lock gemian-lock gemian-leds cmst"
+GEMIAN_PACKAGES="hybris-usb lxc-android libhybris libqt5core5a libqt5dbus5 libqt5gui5 libqt5widgets5 libqt5x11extras5 libqtermwidget5-0 libqt5xml5 drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid ofono repowerd xss-lock gemian-lock gemian-leds cmst"
 STRETCH_PACKAGES="libicu57"
 ## End customising
 
@@ -63,6 +66,51 @@ function set_sudo_user() {
   if [ -z "$SUDO_USER" ]; then
     SUDO_USER=root
   fi
+}
+
+function ask() {
+    # http://djm.me/ask
+    while true; do
+
+        if [ "${2:-}" = "Y" ]; then
+            prompt="Y/n"
+            default=Y
+        elif [ "${2:-}" = "N" ]; then
+            prompt="y/N"
+            default=N
+        else
+            prompt="y/n"
+            default=
+        fi
+
+        # Ask the question
+        printf "\t+++++ "
+        read -p "$1 [$prompt] " REPLY
+
+        # Default?
+        if [ -z "$REPLY" ]; then
+            REPLY=$default
+        fi
+
+        # Check if the reply is valid
+        case "$REPLY" in
+            Y*|y*) return 0 ;;
+            N*|n*) return 1 ;;
+        esac
+    done
+}
+
+function exitonerr {
+    # via: http://stackoverflow.com/a/5196108
+    "$@"
+    local status=$?
+
+    if [ $status -ne 0 ]; then
+        echo "Error completing: $1" >&2
+        exit 1
+    fi
+
+    return $status
 }
 
 function do_prepare {
@@ -326,43 +374,59 @@ set_sudo_user
 if [ $DEBUG == 1 ]; then
     do_print_vars
 fi
-if [ $PURGE == 1 ]; then
-    do_purge
-fi
-if [ $PREPARE == 1 ]; then
-    do_prepare
-fi
-if [ $WRITEMULTISTRAPCFG == 1 ]; then
-    write_multistrap_config
-fi
-if [ $MULTISTRAP == 1 ]; then
-    do_multistrap
-fi
-if [ $ADDQEMU == 1 ]; then
-    do_add_qemu
-fi
-if [ $WRITEPOSTSETUP == 1 ]; then
-    write_postsetup_script
-fi
-if [ $WRITEROOTFSCFG == 1 ]; then
-    write_rootfs_config_script
-fi
-if [ $POSTSETUP == 1 ]; then
-    do_postsetup
-fi
-if [ $REMOVEQEMU == 1 ]; then
-    do_remove_qemu
-fi
-if [ $PREPAREIMG == 1 ]; then
-    do_prepare_img
-fi
-if [ $CREATEIMG == 1 ]; then
-    do_create_img
-fi
-if [ $CLEANUP == 1 ]; then
-    do_cleanup
-fi
 
+if ask "Purge files from previous builds?" "Y"; then
+    if [ $PURGE == 1 ] || ([ $PURGE == 2 ] && ask "Delete rootfs from previous builds?" "Y"); then
+        do_purge
+    fi
+    if [ $CLEANUP == 1 ] || ([ $CLEANUP == 2 ] && ask "Delete configuration files from previous builds?" "Y"); then
+        do_cleanup
+    fi
+fi
+if ask "Create rootfs?" "Y"; then
+    if [ $PREPARE == 1 ] || ([ $PREPARE == 2 ] && ask "Prepare build environment?" "Y"); then
+        do_prepare
+    fi
+    if [ $WRITEMULTISTRAPCFG == 1 ] || ([ $WRITEMULTISTRAPCFG == 2 ] && ask "Create multistrap configuration?" "Y"); then
+        write_multistrap_config
+    fi
+    if [ $MULTISTRAP == 1 ] || ([ $MULTISTRAP == 2 ] && ask "Run multistrap to create rootfs?" "Y"); then
+        do_multistrap
+    fi
+fi
+if ask "Run post-install configuration in rootfs?" "Y"; then
+    if [ $ADDQEMU == 1 ] || ([ $ADDQEMU == 2 ] && ask "Add qemu?" "Y"); then
+        do_add_qemu
+    fi
+    if [ $WRITEPOSTSETUP == 1 ] || ([ $WRITEPOSTSETUP == 2 ] && ask "Create postsetup script?" "Y"); then
+        write_postsetup_script
+    fi
+    if [ $WRITEROOTFSCFG == 1 ] || ([ $WRITEROOTFSCFG == 2 ] && ask "Create rootfs configuration script?" "Y"); then
+        write_rootfs_config_script
+    fi
+    if [ $POSTSETUP == 1 ] || ([ $POSTSETUP == 2 ] && ask "Run scripts in rootfs?" "Y"); then
+        do_postsetup
+    fi
+    if [ $REMOVEQEMU == 1 ] || ([ $REMOVEQEMU == 2 ] && ask "Remove qemu?" "Y"); then
+        do_remove_qemu
+    fi
+fi
+if ask "Create image?" "Y"; then
+    if [ $PREPAREIMG == 1 ] || ([ $PREPAREIMG == 2 ] && ask "Prepare image?" "Y"); then
+        do_prepare_img
+    fi
+    if [ $CREATEIMG == 1 ] || ([ $CREATEIMG == 2 ] && ask "Copy rootfs to new image file?" "Y"); then
+        do_create_img
+    fi
+fi
+if ask "Purge temporary files from this build?" "Y"; then
+    if [ $PURGE == 1 ] || ([ $PURGE == 2 ] && ask "Delete rootfs from previous build?" "Y"); then
+        do_purge
+    fi
+    if [ $CLEANUP == 1 ] || ([ $CLEANUP == 2 ] && ask "Delete configuration files from previous build?" "Y"); then
+        do_cleanup
+    fi
+fi
 
 
 
