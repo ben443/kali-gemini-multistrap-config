@@ -39,7 +39,7 @@ BUILD_DIR=$(dirname $DIR_NAME)
 OUT_DIR=${BUILD_DIR}/ROOTFS_OUT
 ROOTFS=${OUT_DIR}/$SUITE
 CONFIG=$SUITE-gemini.conf
-POSTSETUP_SCRIPT=${DIR_NAME}/kali-gemini-postbuild.sh
+POSTSETUP_SCRIPT=${DIR_NAME}/kali-gemini-prep-chroot.sh
 ROOTFS_CONFIG_SCRIPT=${DIR_NAME}/kali-gemini-rootfs-config.sh
 SYS_IMG=${BUILD_DIR}/SYSIMG/$SYS_IMG_FILE
 ROOT_IMG=${BUILD_DIR}/ROOTIMG_OUT/$CURRENT_DATE-$ROOT_IMG_FILE
@@ -114,7 +114,7 @@ function exitonerr {
 }
 
 function do_prepare {
-    printf "\t***** Preparing build environment\n"
+    printf "\t*****     Preparing build environment\n"
     if [ ! -d ${OUT_DIR} ]; then
         mkdir -p ${OUT_DIR}
 	chown $SUDO_USER:$SUDO_USER ${OUT_DIR}
@@ -130,7 +130,7 @@ function do_prepare {
 }
 
 function write_multistrap_config {
-    printf "\t***** Generating multistrap configuration\n"
+    printf "\t*****     Generating multistrap configuration\n"
     cat > ${DIR_NAME}/$CONFIG <<EOF
 [General]
 arch=arm64
@@ -191,45 +191,46 @@ EOF
 }
 
 function do_multistrap {
-    printf "\t***** Multistrapping\n"
+    printf "\t*****     Multistrapping\n"
     multistrap -d ${ROOTFS} -f $CONFIG
 }
 
 function do_add_qemu {
-    printf "\t***** Adding qemu\n"
+    printf "\t*****     Adding qemu\n"
     cp /usr/bin/qemu-aarch64-static $ROOTFS/usr/bin/
 }
 
 function do_remove_qemu {
-    printf "\t***** Removing qemu\n"
+    printf "\t*****     Removing qemu\n"
     rm -f $ROOTFS/usr/bin/qemu-aarch64-static
 }
 
 function write_postsetup_script {
-    printf "\t***** Generating postsetup script\n"
+    printf "\t*****     Generating postsetup script\n"
     cat > ${POSTSETUP_SCRIPT} <<EOF
 #!/bin/sh
 
 #pass path to the root. Don't let it run without one as it will break your system
 if [ "" = "\$1" ] ; then
-  echo "You need to specify a path to the target rootfs"
+    echo "You need to specify a path to the target rootfs"
+    exit 1
 else
-  if [ -e "\$1" ] ; then
-    ROOTFS="\$1"
-  else
-    echo "Root dir \$ROOTFS not found"
-  fi
+    if [ -e "\$1" ] ; then
+        ROOTFS="\$1"
+        sudo mount proc -t proc \$ROOTFS/proc
+        sudo mount dev -t devtmpfs \$ROOTFS/dev
+        sudo mount devpts -t devpts \$ROOTFS/dev/pts
+        sudo mount sys -t sysfs \$ROOTFS/sys
+        sudo mount none -t tmpfs \$ROOTFS/var/cache
+        sudo mount none -t tmpfs \$ROOTFS/var/run
+        sudo mount none -t tmpfs \$ROOTFS/tmp
+        sudo mount none -t tmpfs \$ROOTFS/root
+        sudo mount none -t tmpfs \$ROOTFS/var/log
+    else
+        echo "Root dir \$ROOTFS not found"
+        exit 1
+    fi
 fi
-
-sudo mount proc -t proc \$ROOTFS/proc
-sudo mount dev -t devtmpfs \$ROOTFS/dev
-sudo mount devpts -t devpts \$ROOTFS/dev/pts
-sudo mount sys -t sysfs \$ROOTFS/sys
-sudo mount none -t tmpfs \$ROOTFS/var/cache
-sudo mount none -t tmpfs \$ROOTFS/var/run
-sudo mount none -t tmpfs \$ROOTFS/tmp
-sudo mount none -t tmpfs \$ROOTFS/root
-sudo mount none -t tmpfs \$ROOTFS/var/log
 EOF
 
     chmod 755 ${POSTSETUP_SCRIPT}
@@ -237,7 +238,7 @@ EOF
 }
 
 function write_rootfs_config_script {
-    printf "\t***** Generating post configuration script\n"
+    printf "\t*****     Generating post configuration script\n"
     cat > ${ROOTFS_CONFIG_SCRIPT} <<EOF
 #!/bin/sh
 mkdir /nvcfg
@@ -302,7 +303,7 @@ EOF
 }
 
 function do_postsetup {
-    printf "\t***** Running post configuration scripts in rootfs\n"
+    printf "\t*****     Running post configuration scripts in rootfs\n"
     ${POSTSETUP_SCRIPT} $ROOTFS
     chroot $ROOTFS dpkg --configure -a
     cp -rv configs/* $ROOTFS
@@ -326,7 +327,7 @@ function do_postsetup {
 }
 
 function do_prepare_img {
-    printf "\t***** Preparing image file\n"
+    printf "\t*****     Preparing image file\n"
     size=$(du -sm $ROOTFS | cut -f1)
     size=$(($size + 400))
     if [ debug = 1 ]; then
@@ -339,7 +340,7 @@ function do_prepare_img {
 }
 
 function do_create_img {
-    printf "\t***** Filling image file\n"
+    printf "\t*****     Filling image file\n"
     if [ ! -d ${TMP_MNT} ]; then
         mkdir -p ${TMP_MNT}
     fi
@@ -349,13 +350,13 @@ function do_create_img {
 }
 
 function do_purge {
-    printf "\t***** Purging files from previous runs\n"
+    printf "\t*****     Purging files from previous runs\n"
     rm -fr $ROOTFS
     do_cleanup
 }
 
 function do_cleanup {
-    printf "\t***** Deleting configuration files from previous runs\n"
+    printf "\t*****     Deleting configuration files from previous runs\n"
     rm -f $POSTSETUP_SCRIPT
     rm -f $ROOTFS_CONFIG_SCRIPT
     rm -f ${DIR_NAME}/$CONFIG
@@ -376,54 +377,54 @@ if [ $DEBUG == 1 ]; then
 fi
 
 if ask "Purge files from previous builds?" "Y"; then
-    if [ $PURGE == 1 ] || ([ $PURGE == 2 ] && ask "Delete rootfs from previous builds?" "Y"); then
+    if [ $PURGE == 1 ] || ([ $PURGE == 2 ] && ask "  - Delete rootfs from previous builds?" "Y"); then
         do_purge
     fi
-    if [ $CLEANUP == 1 ] || ([ $CLEANUP == 2 ] && ask "Delete configuration files from previous builds?" "Y"); then
+    if [ $CLEANUP == 1 ] || ([ $CLEANUP == 2 ] && ask "  - Delete configuration files from previous builds?" "Y"); then
         do_cleanup
     fi
 fi
 if ask "Create rootfs?" "Y"; then
-    if [ $PREPARE == 1 ] || ([ $PREPARE == 2 ] && ask "Prepare build environment?" "Y"); then
+    if [ $PREPARE == 1 ] || ([ $PREPARE == 2 ] && ask "  - Prepare build environment?" "Y"); then
         do_prepare
     fi
-    if [ $WRITEMULTISTRAPCFG == 1 ] || ([ $WRITEMULTISTRAPCFG == 2 ] && ask "Create multistrap configuration?" "Y"); then
+    if [ $WRITEMULTISTRAPCFG == 1 ] || ([ $WRITEMULTISTRAPCFG == 2 ] && ask "  - Create multistrap configuration?" "Y"); then
         write_multistrap_config
     fi
-    if [ $MULTISTRAP == 1 ] || ([ $MULTISTRAP == 2 ] && ask "Run multistrap to create rootfs?" "Y"); then
+    if [ $MULTISTRAP == 1 ] || ([ $MULTISTRAP == 2 ] && ask "  - Run multistrap to create rootfs?" "Y"); then
         do_multistrap
     fi
 fi
 if ask "Run post-install configuration in rootfs?" "Y"; then
-    if [ $ADDQEMU == 1 ] || ([ $ADDQEMU == 2 ] && ask "Add qemu?" "Y"); then
+    if [ $ADDQEMU == 1 ] || ([ $ADDQEMU == 2 ] && ask "  - Add qemu?" "Y"); then
         do_add_qemu
     fi
-    if [ $WRITEPOSTSETUP == 1 ] || ([ $WRITEPOSTSETUP == 2 ] && ask "Create postsetup script?" "Y"); then
+    if [ $WRITEPOSTSETUP == 1 ] || ([ $WRITEPOSTSETUP == 2 ] && ask "  - Create postsetup script?" "Y"); then
         write_postsetup_script
     fi
-    if [ $WRITEROOTFSCFG == 1 ] || ([ $WRITEROOTFSCFG == 2 ] && ask "Create rootfs configuration script?" "Y"); then
+    if [ $WRITEROOTFSCFG == 1 ] || ([ $WRITEROOTFSCFG == 2 ] && ask "  - Create rootfs configuration script?" "Y"); then
         write_rootfs_config_script
     fi
-    if [ $POSTSETUP == 1 ] || ([ $POSTSETUP == 2 ] && ask "Run scripts in rootfs?" "Y"); then
+    if [ $POSTSETUP == 1 ] || ([ $POSTSETUP == 2 ] && ask "  - Run scripts in rootfs?" "Y"); then
         do_postsetup
     fi
-    if [ $REMOVEQEMU == 1 ] || ([ $REMOVEQEMU == 2 ] && ask "Remove qemu?" "Y"); then
+    if [ $REMOVEQEMU == 1 ] || ([ $REMOVEQEMU == 2 ] && ask "  - Remove qemu?" "Y"); then
         do_remove_qemu
     fi
 fi
 if ask "Create image?" "Y"; then
-    if [ $PREPAREIMG == 1 ] || ([ $PREPAREIMG == 2 ] && ask "Prepare image?" "Y"); then
+    if [ $PREPAREIMG == 1 ] || ([ $PREPAREIMG == 2 ] && ask "  - Prepare image?" "Y"); then
         do_prepare_img
     fi
-    if [ $CREATEIMG == 1 ] || ([ $CREATEIMG == 2 ] && ask "Copy rootfs to new image file?" "Y"); then
+    if [ $CREATEIMG == 1 ] || ([ $CREATEIMG == 2 ] && ask "  - Copy rootfs to new image file?" "Y"); then
         do_create_img
     fi
 fi
 if ask "Purge temporary files from this build?" "Y"; then
-    if [ $PURGE == 1 ] || ([ $PURGE == 2 ] && ask "Delete rootfs from previous build?" "Y"); then
+    if [ $PURGE == 1 ] || ([ $PURGE == 2 ] && ask "  - Delete rootfs from previous build?" "Y"); then
         do_purge
     fi
-    if [ $CLEANUP == 1 ] || ([ $CLEANUP == 2 ] && ask "Delete configuration files from previous build?" "Y"); then
+    if [ $CLEANUP == 1 ] || ([ $CLEANUP == 2 ] && ask "  - Delete configuration files from previous build?" "Y"); then
         do_cleanup
     fi
 fi
