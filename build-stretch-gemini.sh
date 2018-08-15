@@ -252,7 +252,7 @@ suite=stretch
 
 [Gemian]
 packages=$GEMIAN_PACKAGES
-source=http://gemian.thinkglobally.org/buster/
+source=http://gemian.thinkglobally.org/stretch/
 suite=stretch
 components=main
 EOF
@@ -296,7 +296,6 @@ else
         sudo mount devpts -t devpts \$ROOTFS/dev/pts
         sudo mount sys -t sysfs \$ROOTFS/sys
         sudo mount none -t tmpfs \$ROOTFS/var/cache
-        ##sudo mount none -t tmpfs \$ROOTFS/var/run
         sudo mount none -t tmpfs \$ROOTFS/tmp
         sudo mount none -t tmpfs \$ROOTFS/root
         sudo mount none -t tmpfs \$ROOTFS/var/log
@@ -395,7 +394,6 @@ function do_postsetup {
     umount -l $ROOTFS/dev
     umount -l $ROOTFS/sys
     umount -l $ROOTFS/var/cache
-    ##umount -l $ROOTFS/var/run
     umount -l $ROOTFS/tmp
     umount -l $ROOTFS/root
     umount -l $ROOTFS/var/log
@@ -427,7 +425,7 @@ function do_create_img {
 function do_purge {
     printf "\t*****     Purging files from previous runs\n"
     rm -fr $ROOTFS
-    make O=$KERNEL_OUT -C $KERNEL_SRC ARCH=arm64  CROSS_COMPILE=$CROSS_COMPILER mproper
+    rm -fr $KERNEL_OUT
     rm -fr $MODULES_OUT
     do_cleanup
 }
