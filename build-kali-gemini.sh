@@ -382,6 +382,8 @@ function do_postsetup {
     printf "\t*****     Running post configuration scripts in rootfs\n"
     ${POSTSETUP_SCRIPT} $ROOTFS
     DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
+      LC_ALL=C LANGUAGE=C LANG=C chroot $ROOTFS /var/lib/dpkg/info/dash.preinst install
+    DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
       LC_ALL=C LANGUAGE=C LANG=C chroot $ROOTFS dpkg --configure -a
     cp -rv configs/* $ROOTFS
 
