@@ -28,7 +28,6 @@ CREATEIMG=2
 # Packages to install
 BUSTER_PACKAGES="task-lxqt-desktop ark bash-completion bluez breeze bzip2 chromium dosfstools exfat-utils file fonts-hack-ttf fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-mono gdisk gstreamer1.0-plugins-base gtk3-engines-breeze gvfs-backends hunspell-en-us hyphen-en-us isc-dhcp-common iw kate kcharselect kde-style-breeze-qt4 kdelibs5-data kpackagelauncherqml kwin-x11 libfm-qt-l10n libglib2.0-data libkf5config-bin libkf5dbusaddons-bin libkf5globalaccel-bin libkf5iconthemes-bin libkf5xmlgui-bin liblxqt-l10n libreoffice libreoffice-gtk2 libreoffice-librelogo libvlc-bin locales lxc lximage-qt lximage-qt-l10n lxqt-about-l10n lxqt-admin-l10n lxqt-config-l10n lxqt-globalkeys-l10n lxqt-notificationd-l10n lxqt-openssh-askpass-l10n lxqt-panel-l10n lxqt-policykit-l10n lxqt-powermanagement-l10n lxqt-runner-l10n lxqt-session-l10n lxqt-sudo lxqt-sudo-l10n mythes-en-us ncurses-term net-tools ntfs-3g p7zip-full pavucontrol-qt pavucontrol-qt-l10n pcmanfm-qt-l10n policykit-1 psmisc qlipper qpdfview qpdfview-djvu-plugin qpdfview-ps-plugin qpdfview-translations qt5-gtk-platformtheme qt5-image-formats-plugins qterminal qterminal-l10n qttranslations5-l10n rename rsync rtkit saytime smplayer smplayer-l10n smplayer-themes ssh sudo unzip upower wget wpasupplicant xdg-user-dirs xdg-utils xz-utils youtube-dl"
 GEMIAN_PACKAGES="hybris-usb lxc-android libhybris drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid ofono repowerd xss-lock gemian-lock gemian-leds cmst"
-STRETCH_PACKAGES="libicu57"
 ## End customising
 
 
@@ -245,18 +244,11 @@ aptsources=Buster Gemian
 # The order of sections is not important.
 bootstrap=Buster Gemian
 
-[Stretch]
-packages=${STRETCH_PACKAGES}
-source=http://mirror.aarnet.edu.au/debian
-keyring=debian-archive-keyring
-suite=stretch
-
 [Buster]
-packages=$BUSTER_PACKAGES
+packages=${BUSTER_PACKAGES}
 source=http://mirror.aarnet.edu.au/debian
 keyring=debian-archive-keyring
 suite=buster
-components=main contrib non-free
 
 [Gemian]
 packages=$GEMIAN_PACKAGES
@@ -304,7 +296,6 @@ else
         sudo mount devpts -t devpts \$ROOTFS/dev/pts
         sudo mount sys -t sysfs \$ROOTFS/sys
         sudo mount none -t tmpfs \$ROOTFS/var/cache
-        ##sudo mount none -t tmpfs \$ROOTFS/var/run
         sudo mount none -t tmpfs \$ROOTFS/tmp
         sudo mount none -t tmpfs \$ROOTFS/root
         sudo mount none -t tmpfs \$ROOTFS/var/log
@@ -403,7 +394,6 @@ function do_postsetup {
     umount -l $ROOTFS/dev
     umount -l $ROOTFS/sys
     umount -l $ROOTFS/var/cache
-    ##umount -l $ROOTFS/var/run
     umount -l $ROOTFS/tmp
     umount -l $ROOTFS/root
     umount -l $ROOTFS/var/log
@@ -435,7 +425,7 @@ function do_create_img {
 function do_purge {
     printf "\t*****     Purging files from previous runs\n"
     rm -fr $ROOTFS
-    make O=$KERNEL_OUT -C $KERNEL_SRC ARCH=arm64  CROSS_COMPILE=$CROSS_COMPILER mproper
+    rm -fr $KERNEL_OUT
     rm -fr $MODULES_OUT
     do_cleanup
 }
