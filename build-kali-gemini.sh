@@ -1,5 +1,6 @@
 #!/bin/bash
 ## Customise this:
+KERNEL_VER=7
 SUITE=kali
 SYS_IMG_FILE=system.img
 ROOT_IMG_FILE=linux_root.img
@@ -11,8 +12,11 @@ DEBUG=1
 PURGE=2
 CLEANUP=2
 PREPARE=2
+COMPILEKERNEL=2
+PKGKERNEL=2
 WRITEMULTISTRAPCFG=2
 MULTISTRAP=2
+ADDKERNELMODS=2
 ADDQEMU=2
 WRITEPOSTSETUP=2
 WRITEROOTFSCFG=2
@@ -23,10 +27,9 @@ CREATEIMG=2
 
 # Packages to install
 KALI_KALI="kali-defaults kali-menu desktop-base kali-linux-top10 kali-root-login firmware-realtek firmware-atheros firmware-libertas"
-KALI_GENERIC="task-lxqt-desktop ark bash-completion bluez breeze bzip2 chromium dosfstools exfat-utils file fonts-hack-ttf fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-mono gdisk gstreamer1.0-plugins-base gtk3-engines-breeze gvfs-backends hunspell-en-us hyphen-en-us isc-dhcp-common iw kate kcharselect kde-style-breeze-qt4 kdelibs5-data kpackagelauncherqml kwin-x11 libfm-qt-l10n libglib2.0-data libkf5config-bin libkf5dbusaddons-bin libkf5globalaccel-bin libkf5iconthemes-bin libkf5xmlgui-bin liblxqt-l10n libvlc-bin locales lxc lximage-qt lximage-qt-l10n lxqt-about-l10n lxqt-admin-l10n lxqt-config-l10n lxqt-globalkeys-l10n lxqt-notificationd-l10n lxqt-openssh-askpass-l10n lxqt-panel-l10n lxqt-policykit-l10n lxqt-powermanagement-l10n lxqt-runner-l10n lxqt-session-l10n lxqt-sudo lxqt-sudo-l10n mythes-en-us ncurses-term net-tools ntfs-3g p7zip-full pavucontrol-qt pavucontrol-qt-l10n pcmanfm-qt-l10n policykit-1 psmisc qlipper qpdfview qpdfview-djvu-plugin qpdfview-ps-plugin qpdfview-translations qt5-gtk-platformtheme qt5-image-formats-plugins qterminal qterminal-l10n qttranslations5-l10n rename rsync rtkit saytime smplayer smplayer-l10n smplayer-themes ssh sudo unzip upower wget wpasupplicant xdg-user-dirs xdg-utils xz-utils youtube-dl"
+KALI_GENERIC="task-lxqt-desktop ark bash-completion bluez breeze bzip2 chromium dosfstools exfat-utils file fonts-hack-ttf fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-mono gdisk gstreamer1.0-plugins-base gtk3-engines-breeze gvfs-backends hunspell-en-us hyphen-en-us isc-dhcp-common iw kate kcharselect kde-style-breeze-qt4 kdelibs5-data kpackagelauncherqml kwin-x11 libfm-qt-l10n libglib2.0-data libkf5config-bin libkf5dbusaddons-bin libkf5globalaccel-bin libkf5iconthemes-bin libkf5xmlgui-bin liblxqt-l10n libreoffice libreoffice-gtk2 libreoffice-librelogo libvlc-bin locales lxc lximage-qt lximage-qt-l10n lxqt-about-l10n lxqt-admin-l10n lxqt-config-l10n lxqt-globalkeys-l10n lxqt-notificationd-l10n lxqt-openssh-askpass-l10n lxqt-panel-l10n lxqt-policykit-l10n lxqt-powermanagement-l10n lxqt-runner-l10n lxqt-session-l10n lxqt-sudo lxqt-sudo-l10n mythes-en-us ncurses-term net-tools ntfs-3g p7zip-full pavucontrol-qt pavucontrol-qt-l10n pcmanfm-qt-l10n policykit-1 psmisc qlipper qpdfview qpdfview-djvu-plugin qpdfview-ps-plugin qpdfview-translations qt5-gtk-platformtheme qt5-image-formats-plugins qterminal qterminal-l10n qttranslations5-l10n rename rsync rtkit saytime smplayer smplayer-l10n smplayer-themes ssh sudo unzip upower wget wpasupplicant xdg-user-dirs xdg-utils xz-utils youtube-dl"
 KALI_PACKAGES="${KALI_KALI} ${KALI_GENERIC}"
-GEMIAN_PACKAGES="hybris-usb lxc-android libhybris libqt5core5a libqt5dbus5 libqt5gui5 libqt5widgets5 libqt5x11extras5 libqtermwidget5-0 libqt5xml5 drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid ofono repowerd xss-lock gemian-lock gemian-leds cmst"
-STRETCH_PACKAGES="libicu57"
+GEMIAN_PACKAGES="hybris-usb lxc-android libhybris drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid ofono repowerd xss-lock gemian-lock gemian-leds cmst"
 ## End customising
 
 
@@ -42,6 +45,14 @@ CONFIG=$SUITE-gemini.conf
 POSTSETUP_SCRIPT=${DIR_NAME}/kali-gemini-prep-chroot.sh
 ROOTFS_CONFIG_SCRIPT=${DIR_NAME}/kali-gemini-rootfs-config.sh
 SYS_IMG=${BUILD_DIR}/SYSIMG/$SYS_IMG_FILE
+CROSS_COMPILER=${BUILD_DIR}/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+KERNEL_SRC=${BUILD_DIR}/kernel-3.18
+KERNEL_CONFIG=$KERNEL_SRC/arch/arm64/configs/kali_gemini_defconfig
+RAMDISK=${BUILD_DIR}/RAMDISK/ramdisk.cpio.gz
+KERNEL_OUT=${BUILD_DIR}/KERNEL_OUT
+MODULES_OUT=${BUILD_DIR}/MODULES_OUT
+KERNELIMG_OUT=${BUILD_DIR}/KERNELIMG_OUT
+MKBOOTIMG=${BUILD_DIR}/mkbootimg/mkbootimg
 ROOT_IMG=${BUILD_DIR}/ROOTIMG_OUT/$CURRENT_DATE-$ROOT_IMG_FILE
 TMP_MNT=/tmp/temp_mount/
 
@@ -56,6 +67,14 @@ function do_print_vars {
     printf "CONFIG = $CONFIG\n"
     printf "POSTSETUP_SCRIPT = ${POSTSETUP_SCRIPT}\n"
     printf "ROOTFS_CONFIG_SCRIPT = ${ROOTFS_CONFIG_SCRIPT}\n"
+    printf "CROSS_COMPILER = ${CROSS_COMPILER}\n"
+    printf "KERNEL_SRC = ${KERNEL_SRC}\n"
+    printf "KERNEL_CONFIG = ${KERNEL_CONFIG}\n"
+    printf "RAMDISK = ${RAMDISK}\n"
+    printf "KERNEL_OUT = ${KERNEL_OUT}\n"
+    printf "MODULES_OUT = ${MODULES_OUT}\n"
+    printf "KERNELIMG_OUT = ${KERNELIMG_OUT}\n"
+    printf "MKBOOTIMG = ${MKBOOTIMG}\n"
     printf "SYS_IMG = ${SYS_IMG}\n"
     printf "TMP_MNT = ${TMP_MNT}\n"
     printf "SUDO_USER = $SUDO_USER\n"
@@ -119,6 +138,18 @@ function do_prepare {
         mkdir -p ${OUT_DIR}
 	chown $SUDO_USER:$SUDO_USER ${OUT_DIR}
     fi
+    if [ ! -d ${KERNEL_OUT} ]; then
+        mkdir -p ${KERNEL_OUT}
+	chown $SUDO_USER:$SUDO_USER ${KERNEL_OUT}
+    fi
+    if [ ! -d ${KERNELIMG_OUT} ]; then
+        mkdir -p ${KERNELIMG_OUT}
+	chown $SUDO_USER:$SUDO_USER ${KERNELIMG_OUT}
+    fi
+    if [ ! -d ${MODULES_OUT} ]; then
+        mkdir -p ${MODULES_OUT}
+	chown $SUDO_USER:$SUDO_USER ${MODULES_OUT}
+    fi
     if [ ! -d ${ROOTFS} ]; then
         mkdir -p ${ROOTFS}
 	chown $SUDO_USER:$SUDO_USER ${ROOTFS}
@@ -129,12 +160,59 @@ function do_prepare {
     fi
 }
 
+function do_compile_kernel {
+    if ask "  - Reset kernel config?" "Y"; then
+        printf "\t****     Using kernel config ${KERNEL_CONFIG} ****\n"
+        cp ${KERNEL_CONFIG} $KERNEL_OUT/.config
+    fi
+    if ask "  - Reset kernel version to ${KERNEL_VER}?" "Y"; then
+        ((version = $KERNEL_VER -1)) 
+        printf "\t****     Setting  kernel version to ${KERNEL_VER} ****\n"
+        echo $version > ${KERNEL_OUT}/.version
+    fi
+    NUM_CPUS=`nproc`
+    make O=$KERNEL_OUT -C $KERNEL_SRC ARCH=arm64  CROSS_COMPILE=$CROSS_COMPILER menuconfig 
+    make O=$KERNEL_OUT -C $KERNEL_SRC ARCH=arm64  CROSS_COMPILE=$CROSS_COMPILER -j${NUM_CPUS}
+    make O=$KERNEL_OUT -C $KERNEL_SRC ARCH=arm64  CROSS_COMPILE=$CROSS_COMPILER -j${NUM_CPUS} modules
+}
+
+function do_package_kernel {
+    OUT_DIR=$KERNELIMG_OUT/$CURRENT_DATE-$KERNEL_VER
+    if [ ! -d ${OUT_DIR} ]; then
+        mkdir -p ${OUT_DIR}
+	chown $SUDO_USER:$SUDO_USER ${OUT_DIR}
+    fi
+    $MKBOOTIMG \
+    --kernel $KERNEL_OUT/arch/arm64/boot/Image.gz-dtb \
+    --ramdisk $RAMDISK \
+    --base 0x40080000 \
+    --second_offset 0x00e80000 \
+    --cmdline "bootopt=64S3,32N2,64N2 log_buf_len=4M" \
+    --kernel_offset 0x00000000 \
+    --ramdisk_offset 0x04f80000 \
+    --tags_offset 0x03f80000 \
+    --pagesize 2048 \
+    -o $OUT_DIR/linux_boot.img
+
+    chown $SUDO_USER:$SUDO_USER OUT_DIR/linux_boot.img
+
+    cp $KERNEL_OUT/.config $OUT_DIR
+    chown $SUDO_USER:$SUDO_USER OUT_DIR/.config
+
+    make O=$KERNEL_OUT -C $KERNEL_SRC ARCH=arm64  CROSS_COMPILE=$CROSS_COMPILER -j${NUM_CPUS} INSTALL_MOD_PATH=$MODULES_OUT modules_install
+    rm $MODULES_OUT/lib/modules/3.18.41-kali+/build
+    rm $MODULES_OUT/lib/modules/3.18.41-kali+/source
+    tar -C $MODULES_OUT -cJf $OUT_DIR/modules-3.18.41-kali#$KERNEL_VER.tar.xz lib
+    chown $SUDO_USER:$SUDO_USER $OUT_DIR/modules-3.18.41-kali#$KERNEL_VER.tar.xz
+}
+    
+
 function write_multistrap_config {
     printf "\t*****     Generating multistrap configuration\n"
     cat > ${DIR_NAME}/$CONFIG <<EOF
 [General]
 arch=arm64
-directory=gemian-rootfs
+directory=${ROOTFS}
 # same as --tidy-up option if set to true
 cleanup=true
 # same as --no-auth option if set to true
@@ -148,9 +226,9 @@ unpack=true
 explicitsuite=false
 # this setupscript is to properly mount filesystems for configuration step
 # and copy files
-configscript=debian-gemini-setup.sh
+configscript=$POSTSETUP_SCRIPT
 # copied into the chroot to be executed later
-configscript=debian-gemini-config.sh
+configscript=$ROOTFS_CONFIG_SCRIPT
 # add packages of Priority: important
 addimportant=true
 # allow Recommended packages to be seen as strict dependencies
@@ -166,13 +244,7 @@ aptsources=Kali Gemian
 # is used to calculate the list of Priority: required packages
 # and which packages go into the rootfs.
 # The order of sections is not important.
-bootstrap=Stretch Kali Gemian
-
-[Stretch]
-packages=${STRETCH_PACKAGES}
-source=http://http.debian.net/debian
-keyring=debian-archive-keyring
-suite=stretch
+bootstrap=Kali Gemian
 
 [Kali]
 packages=$KALI_PACKAGES
@@ -193,6 +265,11 @@ EOF
 function do_multistrap {
     printf "\t*****     Multistrapping\n"
     multistrap -d ${ROOTFS} -f $CONFIG
+}
+
+function do_add_kernel_modules {
+    printf "\t*****     Installing kernel modules\n"
+    rsync --progress -a ${MODULES_OUT}/lib/* ${ROOTFS}/lib/
 }
 
 function do_add_qemu {
@@ -222,7 +299,6 @@ else
         sudo mount devpts -t devpts \$ROOTFS/dev/pts
         sudo mount sys -t sysfs \$ROOTFS/sys
         sudo mount none -t tmpfs \$ROOTFS/var/cache
-        sudo mount none -t tmpfs \$ROOTFS/var/run
         sudo mount none -t tmpfs \$ROOTFS/tmp
         sudo mount none -t tmpfs \$ROOTFS/root
         sudo mount none -t tmpfs \$ROOTFS/var/log
@@ -305,7 +381,8 @@ EOF
 function do_postsetup {
     printf "\t*****     Running post configuration scripts in rootfs\n"
     ${POSTSETUP_SCRIPT} $ROOTFS
-    chroot $ROOTFS dpkg --configure -a
+    DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
+      LC_ALL=C LANGUAGE=C LANG=C chroot $ROOTFS dpkg --configure -a
     cp -rv configs/* $ROOTFS
 
     cp ${ROOTFS_CONFIG_SCRIPT} $ROOTFS/config.sh
@@ -320,7 +397,6 @@ function do_postsetup {
     umount -l $ROOTFS/dev
     umount -l $ROOTFS/sys
     umount -l $ROOTFS/var/cache
-    umount -l $ROOTFS/var/run
     umount -l $ROOTFS/tmp
     umount -l $ROOTFS/root
     umount -l $ROOTFS/var/log
@@ -352,6 +428,8 @@ function do_create_img {
 function do_purge {
     printf "\t*****     Purging files from previous runs\n"
     rm -fr $ROOTFS
+    rm -fr $KERNEL_OUT
+    rm -fr $MODULES_OUT
     do_cleanup
 }
 
@@ -384,20 +462,12 @@ if ask "Purge files from previous builds?" "Y"; then
         do_cleanup
     fi
 fi
-if ask "Create rootfs?" "Y"; then
+if ask "Create build environment?" "Y"; then
     if [ $PREPARE == 1 ] || ([ $PREPARE == 2 ] && ask "  - Prepare build environment?" "Y"); then
         do_prepare
     fi
     if [ $WRITEMULTISTRAPCFG == 1 ] || ([ $WRITEMULTISTRAPCFG == 2 ] && ask "  - Create multistrap configuration?" "Y"); then
         write_multistrap_config
-    fi
-    if [ $MULTISTRAP == 1 ] || ([ $MULTISTRAP == 2 ] && ask "  - Run multistrap to create rootfs?" "Y"); then
-        do_multistrap
-    fi
-fi
-if ask "Run post-install configuration in rootfs?" "Y"; then
-    if [ $ADDQEMU == 1 ] || ([ $ADDQEMU == 2 ] && ask "  - Add qemu?" "Y"); then
-        do_add_qemu
     fi
     if [ $WRITEPOSTSETUP == 1 ] || ([ $WRITEPOSTSETUP == 2 ] && ask "  - Create postsetup script?" "Y"); then
         write_postsetup_script
@@ -405,7 +475,26 @@ if ask "Run post-install configuration in rootfs?" "Y"; then
     if [ $WRITEROOTFSCFG == 1 ] || ([ $WRITEROOTFSCFG == 2 ] && ask "  - Create rootfs configuration script?" "Y"); then
         write_rootfs_config_script
     fi
-    if [ $POSTSETUP == 1 ] || ([ $POSTSETUP == 2 ] && ask "  - Run scripts in rootfs?" "Y"); then
+fi
+if ask "Compile custom kernel?" "Y"; then
+    if [ $COMPILEKERNEL == 1 ] || ([ $COMPILEKERNEL == 2 ] && ask "  - Compile kernel?" "Y"); then
+        do_compile_kernel
+    fi
+    if [ $PKGKERNEL == 1 ] || ([ $PKGKERNEL == 2 ] && ask "  - Package kernel?" "Y"); then
+        do_package_kernel
+    fi
+fi
+if ask "Create rootfs?" "Y"; then
+    if [ $MULTISTRAP == 1 ] || ([ $MULTISTRAP == 2 ] && ask "  - Run multistrap to create rootfs?" "Y"); then
+        do_multistrap
+    fi
+    if [ $ADDQEMU == 1 ] || ([ $ADDQEMU == 2 ] && ask "  - Add qemu?" "Y"); then
+        do_add_qemu
+    fi
+    if [ $ADDKERNELMODS == 1 ] || ([ $ADDKERNELMODS == 2 ] && ask "  - Install kernel modules from ${MODULES_OUT}?" "Y"); then
+        do_add_kernel_modules
+    fi
+    if [ $POSTSETUP == 1 ] || ([ $POSTSETUP == 2 ] && ask "  - Configure rootfs?" "Y"); then
         do_postsetup
     fi
     if [ $REMOVEQEMU == 1 ] || ([ $REMOVEQEMU == 2 ] && ask "  - Remove qemu?" "Y"); then
