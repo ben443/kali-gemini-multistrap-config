@@ -1,6 +1,6 @@
 #!/bin/bash
 ## Customise this:
-KERNEL_VER=7
+KERNEL_VER=8
 SUITE=kali
 SYS_IMG_FILE=system.img
 ROOT_IMG_FILE=linux_root.img
@@ -10,6 +10,7 @@ DEBUG=1
 #                         1=Execute
 #                         2=Ask )
 PURGE=2
+PURGEKERNEL=2
 CLEANUP=2
 PREPARE=2
 COMPILEKERNEL=2
@@ -24,6 +25,8 @@ POSTSETUP=2
 REMOVEQEMU=2
 PREPAREIMG=2
 CREATEIMG=2
+ARCHIVEKERNEL=2
+ARCHIVEROOTFS=2
 
 # Packages to install
 KALI_KALI="kali-defaults kali-menu desktop-base kali-linux-top10 kali-root-login firmware-realtek firmware-atheros firmware-libertas"
@@ -40,6 +43,7 @@ DIR_NAME=$(dirname $REAL_PATH)
 BASE_NAME=$(basename $PROG_NAME)
 BUILD_DIR=$(dirname $DIR_NAME)
 OUT_DIR=${BUILD_DIR}/ROOTFS_OUT
+ARCH_DIR=${BUILD_DIR}/ARCHIVE
 ROOTFS=${OUT_DIR}/$SUITE
 CONFIG=$SUITE-gemini.conf
 POSTSETUP_SCRIPT=${DIR_NAME}/kali-gemini-prep-chroot.sh
@@ -55,6 +59,8 @@ KERNELIMG_OUT=${BUILD_DIR}/KERNELIMG_OUT
 MKBOOTIMG=${BUILD_DIR}/mkbootimg/mkbootimg
 ROOT_IMG=${BUILD_DIR}/ROOTIMG_OUT/$CURRENT_DATE-$ROOT_IMG_FILE
 TMP_MNT=/tmp/temp_mount/
+KERNELARCH=$ARCH_DIR/$(basename $KERNEL_SRC)-$KERNEL_VER-$CURRENT_DATE-$SUITE.tar.xz
+ROOTFSARCH=$ARCH_DIR/$SUITE-unconfigured-no-modules-$CURRENT_DATE.tar.xz
 
 function do_print_vars {
 
@@ -74,6 +80,8 @@ function do_print_vars {
     printf "KERNEL_OUT = ${KERNEL_OUT}\n"
     printf "MODULES_OUT = ${MODULES_OUT}\n"
     printf "KERNELIMG_OUT = ${KERNELIMG_OUT}\n"
+    printf "KERNELARCH = ${KERNELARCH}\n"
+    printf "ROOTFSARCH = ${ROOTFSARCH}\n"
     printf "MKBOOTIMG = ${MKBOOTIMG}\n"
     printf "SYS_IMG = ${SYS_IMG}\n"
     printf "TMP_MNT = ${TMP_MNT}\n"
@@ -137,6 +145,10 @@ function do_prepare {
     if [ ! -d ${OUT_DIR} ]; then
         mkdir -p ${OUT_DIR}
 	chown $SUDO_USER:$SUDO_USER ${OUT_DIR}
+    fi
+    if [ ! -d ${ARCH_DIR} ]; then
+        mkdir -p ${ARCH_DIR}
+        chown $SUDO_USER:$SUDO_USER ${ARCH_DIR}
     fi
     if [ ! -d ${KERNEL_OUT} ]; then
         mkdir -p ${KERNEL_OUT}
@@ -202,10 +214,14 @@ function do_package_kernel {
     make O=$KERNEL_OUT -C $KERNEL_SRC ARCH=arm64  CROSS_COMPILE=$CROSS_COMPILER -j${NUM_CPUS} INSTALL_MOD_PATH=$MODULES_OUT modules_install
     rm $MODULES_OUT/lib/modules/3.18.41-kali+/build
     rm $MODULES_OUT/lib/modules/3.18.41-kali+/source
-    tar -C $MODULES_OUT -cJf $OUT_DIR/modules-3.18.41-kali#$KERNEL_VER.tar.xz lib
+    tar -C $MODULES_OUT -I pxz -cf $OUT_DIR/modules-3.18.41-kali#$KERNEL_VER.tar.xz lib
     chown $SUDO_USER:$SUDO_USER $OUT_DIR/modules-3.18.41-kali#$KERNEL_VER.tar.xz
 }
     
+function do_archive_kernel {
+    tar -C ${BUILD_DIR} -I pxz -cf ${KERNELARCH} $(basename $KERNEL_OUT) $(basename $MODULES_OUT)
+    chown $SUDO_USER:$SUDO_USER ${KERNELARCH}
+}
 
 function write_multistrap_config {
     printf "\t*****     Generating multistrap configuration\n"
@@ -265,6 +281,11 @@ EOF
 function do_multistrap {
     printf "\t*****     Multistrapping\n"
     multistrap -d ${ROOTFS} -f $CONFIG
+}
+
+function do_archive_rootfs {
+    tar -C ${OUT_DIR} -I pxz -cf ${ROOTFSARCH} $(basename $ROOTFS)
+    chown $SUDO_USER:$SUDO_USER ${ROOTFSARCH}
 }
 
 function do_add_kernel_modules {
@@ -338,6 +359,9 @@ systemctl disable connman-wait-online.service
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
 wget -O - http://gemian.thinkglobally.org/archive-key.asc | sudo apt-key add -
 
+# Fix dhcp client bug
+touch /etc/fstab
+
 update-alternatives --set aarch64-linux-gnu_egl_conf /usr/lib/aarch64-linux-gnu/libhybris-egl/ld.so.conf
 mkdir /usr/lib/aarch64-linux-gnu/mesa-egl
 mv /usr/lib/aarch64-linux-gnu/libGLESv* /usr/lib/aarch64-linux-gnu/libEGL.so* /usr/lib/aarch64-linux-gnu/mesa-egl
@@ -407,7 +431,7 @@ function do_postsetup {
 function do_prepare_img {
     printf "\t*****     Preparing image file\n"
     size=$(du -sm $ROOTFS | cut -f1)
-    size=$(($size + 400))
+    size=$(($size + 500))
     if [ debug = 1 ]; then
         printf "\nPROG_NAME = $size\n"
         return 0
@@ -430,9 +454,12 @@ function do_create_img {
 function do_purge {
     printf "\t*****     Purging files from previous runs\n"
     rm -fr $ROOTFS
+}
+
+function do_purgekernel {
+    printf "\t*****     Purging kernel files from previous runs\n"
     rm -fr $KERNEL_OUT
     rm -fr $MODULES_OUT
-    do_cleanup
 }
 
 function do_cleanup {
@@ -460,6 +487,9 @@ if ask "Purge files from previous builds?" "Y"; then
     if [ $PURGE == 1 ] || ([ $PURGE == 2 ] && ask "  - Delete rootfs from previous builds?" "Y"); then
         do_purge
     fi
+    if [ $PURGEKERNEL == 1 ] || ([ $PURGEKERNEL == 2 ] && ask "  - Delete kernels from previous builds?" "Y"); then
+        do_purgekernel
+    fi
     if [ $CLEANUP == 1 ] || ([ $CLEANUP == 2 ] && ask "  - Delete configuration files from previous builds?" "Y"); then
         do_cleanup
     fi
@@ -485,10 +515,16 @@ if ask "Compile custom kernel?" "Y"; then
     if [ $PKGKERNEL == 1 ] || ([ $PKGKERNEL == 2 ] && ask "  - Package kernel?" "Y"); then
         do_package_kernel
     fi
+    if [ $ARCHIVEKERNEL == 1 ] || ([ $ARCHIVEKERNEL == 2 ] && ask "  - Archive KERNEL_OUT & MODULES_OUT directories?" "Y"); then
+        do_archive_kernel
+    fi
 fi
 if ask "Create rootfs?" "Y"; then
     if [ $MULTISTRAP == 1 ] || ([ $MULTISTRAP == 2 ] && ask "  - Run multistrap to create rootfs?" "Y"); then
         do_multistrap
+    fi
+    if [ $ARCHIVEROOTFS == 1 ] || ([ $ARCHIVEROOTFS == 2 ] && ask "  - Archive ROOTFS directory?" "Y"); then
+        do_archive_rootfs
     fi
     if [ $ADDQEMU == 1 ] || ([ $ADDQEMU == 2 ] && ask "  - Add qemu?" "Y"); then
         do_add_qemu
@@ -514,6 +550,9 @@ fi
 if ask "Purge temporary files from this build?" "Y"; then
     if [ $PURGE == 1 ] || ([ $PURGE == 2 ] && ask "  - Delete rootfs from previous build?" "Y"); then
         do_purge
+    fi
+    if [ $PURGEKERNEL == 1 ] || ([ $PURGEKERNEL == 2 ] && ask "  - Delete kernels from previous builds?" "Y"); then
+        do_purgekernel
     fi
     if [ $CLEANUP == 1 ] || ([ $CLEANUP == 2 ] && ask "  - Delete configuration files from previous build?" "Y"); then
         do_cleanup
