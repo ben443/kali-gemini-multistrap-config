@@ -2,6 +2,7 @@
 ## Customise this:
 KERNEL_VER=8
 SUITE=kali
+HOSTNAME=kali
 SYS_IMG_FILE=system.img
 ROOT_IMG_FILE=linux_root.img
 DEBUG=1
@@ -338,6 +339,16 @@ function write_rootfs_config_script {
     printf "\t*****     Generating post configuration script\n"
     cat > ${ROOTFS_CONFIG_SCRIPT} <<EOF
 #!/bin/sh
+groupadd -g 1010 mysql
+useradd -r -g mysql -s /bin/false mysql
+
+mkdir -p /var/log/apache2
+mkdir -p /var/log/samba
+mkdir -p /var/cache/samba
+
+/var/lib/dpkg/info/dash.preinst install
+dpkg --configure -a
+
 mkdir /nvcfg
 mkdir /nvdata
 mkdir /system
@@ -352,9 +363,41 @@ systemctl enable tmp.mount
 systemctl enable android-mount.service
 systemctl enable droid-hal-init
 systemctl enable lxc@android.service
+systemctl enable connman.service
+systemctl enable gemian-leds
+systemctl enable bluetooth
 
 systemctl disable isc-dhcp-server.service  isc-dhcp-server6.service lxc-net.service ureadahead.service systemd-modules-load.service
 systemctl disable connman-wait-online.service
+
+cat << EFO > /lib/systemd/system/resizefs.service
+[Unit]
+Description=Resize filesystem
+After=local-fs.target
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "sudo resize2fs -p /dev/mmcblk0p29"
+ExecStartPost=/bin/systemctl disable resizefs
+[Install]
+WantedBy=multi-user.target
+EFO
+chmod 644 /lib/systemd/system/resizefs.service
+
+cat << EFO > /lib/systemd/system/gemini-lights.service
+[Unit]
+Description=Initialize lights on Gemini
+After=local-fs.target
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "echo \"7 0 0 0 \" > /proc/aw9120_operation"
+[Install]
+WantedBy=multi-user.target
+EFO
+chmod 644 /lib/systemd/system/gemini-lights.service
+
+systemctl enable resizefs
+systemctl enable gemini-lights
+
 
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
 wget -O - http://gemian.thinkglobally.org/archive-key.asc | sudo apt-key add -
@@ -373,9 +416,6 @@ ldconfig
 
 groupadd -g 1001 radio
 useradd -u 1001 -g 1001 -s /usr/sbin/nologin radio
-
-groupadd mysql
-useradd -r -g mysql -s /bin/false mysql
 
 groupadd -g 1000 aid_system
 groupadd -g 1003 aid_graphics
@@ -399,6 +439,21 @@ ln -sf ../lib/systemd/systemd /sbin/init
 mkdir -p /usr/lib/chromium
 ln -sf /usr/lib/aarch64-linux-gnu/libhybris-egl/libEGL.so.1.0.0 /usr/lib/chromium/libEGL.so
 ln -sf /usr/lib/aarch64-linux-gnu/libhybris-egl/libGLESv2.so.2.0.0 /usr/lib/chromium/libGLESv2.so
+
+echo 'LANG="en_US.UTF-8"\n' > /etc/default/locale
+
+echo "${HOSTNAME}" > /etc/hostname
+
+
+cat << EFO > /etc/hosts
+127.0.0.1       ${HOSTNAME}    localhost
+::1             localhost ip6-localhost ip6-loopback
+fe00::0         ip6-localnet
+ff00::0         ip6-mcastprefix
+ff02::1         ip6-allnodes
+ff02::2         ip6-allrouters
+EFO
+
 EOF
 
     chmod 755 ${ROOTFS_CONFIG_SCRIPT}
@@ -407,15 +462,11 @@ EOF
 
 function do_postsetup {
     printf "\t*****     Running post configuration scripts in rootfs\n"
-    ${POSTSETUP_SCRIPT} $ROOTFS
-    DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
-      LC_ALL=C LANGUAGE=C LANG=C chroot $ROOTFS /var/lib/dpkg/info/dash.preinst install
-    DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
-      LC_ALL=C LANGUAGE=C LANG=C chroot $ROOTFS dpkg --configure -a
     cp -rv configs/* $ROOTFS
-
+    cp -rv configs/etc/skel/.config $ROOTFS/root/
+    ${POSTSETUP_SCRIPT} $ROOTFS
     cp ${ROOTFS_CONFIG_SCRIPT} $ROOTFS/config.sh
-    chroot $ROOTFS /config.sh
+    DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true LC_ALL=C LANGUAGE=C LANG=C chroot $ROOTFS /config.sh
     rm $ROOTFS/config.sh
 
     cp ${SYS_IMG} $ROOTFS/data/
