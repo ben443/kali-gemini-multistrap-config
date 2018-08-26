@@ -1,0 +1,383 @@
+Package: cmst
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: cmst
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: connman
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: connman
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: drihybris
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: drihybris
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: gemian-leds
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: gemian-leds
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: gemian-lock
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: gemian-lock
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: glamor-hybris
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: glamor-hybris
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libandroid-properties1
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libandroid-properties1
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libglibutil
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libglibutil
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libgrilio
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libgrilio
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libhardware2
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libhardware2
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libhybris
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libhybris
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libhybris-common1
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libhybris-common1
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: liblxqt-globalkeys-ui0
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: liblxqt-globalkeys-ui0
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: liblxqt-globalkeys0
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: liblxqt-globalkeys0
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libmce-glib
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libmce-glib
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libmedia1
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libmedia1
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libpulse-mainloop-glib0
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libpulse-mainloop-glib0
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libpulse0
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libpulse0
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libpulsedsp
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libpulsedsp
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5concurrent5
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5concurrent5
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5core5a
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5core5a
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5dbus5
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5dbus5
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5gui5
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5gui5
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5network5
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5network5
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5printsupport5
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5printsupport5
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5qml5
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5qml5
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5quick5
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5quick5
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5quickwidgets5
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5quickwidgets5
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5sql5
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5sql5
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5sql5-sqlite
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5sql5-sqlite
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5widgets5
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5widgets5
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libqt5xml5
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libqt5xml5
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: libwspcodec
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: libwspcodec
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: lxc-android
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: lxc-android
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: lxqt-globalkeys
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: lxqt-globalkeys
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: ofono
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: ofono
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: pulseaudio
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: pulseaudio
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: pulseaudio-module-droid
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: pulseaudio-module-droid
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: pulseaudio-utils
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: pulseaudio-utils
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: qml-module-qtqml-models2
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: qml-module-qtqml-models2
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: qml-module-qtquick-layouts
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: qml-module-qtquick-layouts
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: qml-module-qtquick-window2
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: qml-module-qtquick-window2
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: qml-module-qtquick2
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: qml-module-qtquick2
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: qt5-gtk-platformtheme
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: qt5-gtk-platformtheme
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: repowerd
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: repowerd
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: repowerd-data
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: repowerd-data
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: xkb-data
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: xkb-data
+Pin: release a=kali-rolling
+Pin-Priority: -10
+
+Package: xserver-xorg-video-hwcomposer
+Pin: release a=buster
+Pin-Priority: 900
+
+Package: xserver-xorg-video-hwcomposer
+Pin: release a=kali-rolling
+Pin-Priority: -10
