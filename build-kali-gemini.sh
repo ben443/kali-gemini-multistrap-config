@@ -22,6 +22,7 @@ ADDKERNELMODS=2
 ADDQEMU=2
 WRITEPOSTSETUP=2
 WRITEROOTFSCFG=2
+WRITEAPTPREF=2
 POSTSETUP=2
 REMOVEQEMU=2
 PREPAREIMG=2
@@ -33,7 +34,7 @@ ARCHIVEROOTFS=2
 KALI_KALI="kali-defaults kali-menu desktop-base kali-linux-top10 kali-root-login firmware-realtek firmware-atheros firmware-libertas"
 KALI_GENERIC="task-lxqt-desktop ark bash-completion bluez breeze bzip2 chromium dosfstools exfat-utils file fonts-hack-ttf fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-mono gdisk gstreamer1.0-plugins-base gtk3-engines-breeze gvfs-backends hunspell-en-us hyphen-en-us isc-dhcp-common iw kate kcharselect kde-style-breeze-qt4 kdelibs5-data kpackagelauncherqml kwin-x11 libfm-qt-l10n libglib2.0-data libkf5config-bin libkf5dbusaddons-bin libkf5globalaccel-bin libkf5iconthemes-bin libkf5xmlgui-bin liblxqt-l10n libreoffice libreoffice-gtk2 libreoffice-librelogo libvlc-bin locales lxc lximage-qt lximage-qt-l10n lxqt-about-l10n lxqt-admin-l10n lxqt-config-l10n lxqt-globalkeys-l10n lxqt-notificationd-l10n lxqt-openssh-askpass-l10n lxqt-panel-l10n lxqt-policykit-l10n lxqt-powermanagement-l10n lxqt-runner-l10n lxqt-session-l10n lxqt-sudo lxqt-sudo-l10n mythes-en-us ncurses-term net-tools ntfs-3g p7zip-full pavucontrol-qt pavucontrol-qt-l10n pcmanfm-qt-l10n policykit-1 psmisc qlipper qpdfview qpdfview-djvu-plugin qpdfview-ps-plugin qpdfview-translations qt5-gtk-platformtheme qt5-image-formats-plugins qterminal qterminal-l10n qttranslations5-l10n rename rsync rtkit saytime smplayer smplayer-l10n smplayer-themes ssh sudo unzip upower wget wpasupplicant xdg-user-dirs xdg-utils xz-utils youtube-dl"
 KALI_PACKAGES="${KALI_KALI} ${KALI_GENERIC}"
-GEMIAN_PACKAGES="hybris-usb lxc-android libhybris drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid ofono repowerd xss-lock gemian-lock gemian-leds cmst"
+GEMIAN_PACKAGES="hybris-usb lxc-android libhybris drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid libpulse0 pulseaudio ofono repowerd xss-lock gemian-lock gemian-leds cmst"
 ## End customising
 
 
@@ -47,6 +48,7 @@ OUT_DIR=${BUILD_DIR}/ROOTFS_OUT
 ARCH_DIR=${BUILD_DIR}/ARCHIVE
 ROOTFS=${OUT_DIR}/$SUITE
 CONFIG=$SUITE-gemini.conf
+APTPREFERENCES=${DIR_NAME}/preferences
 POSTSETUP_SCRIPT=${DIR_NAME}/kali-gemini-prep-chroot.sh
 ROOTFS_CONFIG_SCRIPT=${DIR_NAME}/kali-gemini-rootfs-config.sh
 SYS_IMG=${BUILD_DIR}/SYSIMG/$SYS_IMG_FILE
@@ -74,6 +76,7 @@ function do_print_vars {
     printf "CONFIG = $CONFIG\n"
     printf "POSTSETUP_SCRIPT = ${POSTSETUP_SCRIPT}\n"
     printf "ROOTFS_CONFIG_SCRIPT = ${ROOTFS_CONFIG_SCRIPT}\n"
+    printf "APT PREFERENCES = ${APTPREFERENCES}\n"
     printf "CROSS_COMPILER = ${CROSS_COMPILER}\n"
     printf "KERNEL_SRC = ${KERNEL_SRC}\n"
     printf "KERNEL_CONFIG = ${KERNEL_CONFIG}\n"
@@ -257,6 +260,7 @@ multiarch=
 # the /etc/apt/sources.list.d/multistrap.sources.list
 # of the target. Order is not important
 aptsources=Kali Gemian
+aptpreferences=$APTPREFERENCES
 # the bootstrap option determines which repository
 # is used to calculate the list of Priority: required packages
 # and which packages go into the rootfs.
@@ -460,6 +464,16 @@ EOF
     chown $SUDO_USER:$SUDO_USER ${ROOTFS_CONFIG_SCRIPT}
 }
 
+function write_aptpreferences {
+    printf "\t*****     Generating apt preferences\n"
+    FILES=configs/etc/apt/preferences.d/*
+    > ${APTPREFERENCES}
+    for f in $FILES
+    do
+        cat $f >> ${APTPREFERENCES}
+    done
+}
+
 function do_postsetup {
     printf "\t*****     Running post configuration scripts in rootfs\n"
     cp -rv configs/* $ROOTFS
@@ -521,6 +535,7 @@ function do_cleanup {
     rm -f $POSTSETUP_SCRIPT
     rm -f $ROOTFS_CONFIG_SCRIPT
     rm -f ${DIR_NAME}/$CONFIG
+    rm -f ${APTPREFERENCES}
 }
 
 if [ $(id -u) -ne 0 ]; then
@@ -551,6 +566,9 @@ fi
 if ask "Create build environment?" "Y"; then
     if [ $PREPARE == 1 ] || ([ $PREPARE == 2 ] && ask "  - Prepare build environment?" "Y"); then
         do_prepare
+    fi
+    if [ $WRITEAPTPREF == 1 ] || ([ $WRITEAPTPREF == 2 ] && ask "  - Create apt preferences list?" "Y"); then
+        write_aptpreferences
     fi
     if [ $WRITEMULTISTRAPCFG == 1 ] || ([ $WRITEMULTISTRAPCFG == 2 ] && ask "  - Create multistrap configuration?" "Y"); then
         write_multistrap_config
