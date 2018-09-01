@@ -32,7 +32,7 @@ ARCHIVEROOTFS=2
 
 # Packages to install
 KALI_KALI="kali-defaults kali-menu desktop-base kali-linux-top10 kali-root-login firmware-realtek firmware-atheros firmware-libertas"
-KALI_GENERIC="task-lxqt-desktop ark bash-completion bluez breeze bzip2 chromium dosfstools exfat-utils file fonts-hack-ttf fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-mono gdisk gstreamer1.0-plugins-base gtk3-engines-breeze gvfs-backends hunspell-en-us hyphen-en-us isc-dhcp-common iw kate kcharselect kde-style-breeze-qt4 kdelibs5-data kpackagelauncherqml kwin-x11 libfm-qt-l10n libglib2.0-data libkf5config-bin libkf5dbusaddons-bin libkf5globalaccel-bin libkf5iconthemes-bin libkf5xmlgui-bin liblxqt-l10n libreoffice libreoffice-gtk2 libreoffice-librelogo libvlc-bin locales lxc lximage-qt lximage-qt-l10n lxqt-about-l10n lxqt-admin-l10n lxqt-config-l10n lxqt-globalkeys-l10n lxqt-notificationd-l10n lxqt-openssh-askpass-l10n lxqt-panel-l10n lxqt-policykit-l10n lxqt-powermanagement-l10n lxqt-runner-l10n lxqt-session-l10n lxqt-sudo lxqt-sudo-l10n mythes-en-us ncurses-term net-tools ntfs-3g p7zip-full pavucontrol-qt pavucontrol-qt-l10n pcmanfm-qt-l10n policykit-1 psmisc qlipper qpdfview qpdfview-djvu-plugin qpdfview-ps-plugin qpdfview-translations qt5-gtk-platformtheme qt5-image-formats-plugins qterminal qterminal-l10n qttranslations5-l10n rename rsync rtkit saytime smplayer smplayer-l10n smplayer-themes ssh sudo unzip upower wget wpasupplicant xdg-user-dirs xdg-utils xz-utils youtube-dl"
+KALI_GENERIC="task-lxqt-desktop ark bash-completion bluez breeze bzip2 dosfstools exfat-utils file firefox-esr fonts-hack-ttf fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-mono gdisk gstreamer1.0-plugins-base gtk3-engines-breeze gvfs-backends hunspell-en-us hyphen-en-us isc-dhcp-common iw kate kcharselect kde-style-breeze-qt4 kdelibs5-data kpackagelauncherqml kwin-x11 libfm-qt-l10n libglib2.0-data libkf5config-bin libkf5dbusaddons-bin libkf5globalaccel-bin libkf5iconthemes-bin libkf5xmlgui-bin liblxqt-l10n libvlc-bin locales lxc lximage-qt lximage-qt-l10n lxqt-about-l10n lxqt-admin-l10n lxqt-config-l10n lxqt-globalkeys-l10n lxqt-notificationd-l10n lxqt-openssh-askpass-l10n lxqt-panel-l10n lxqt-policykit-l10n lxqt-powermanagement-l10n lxqt-runner-l10n lxqt-session-l10n lxqt-sudo lxqt-sudo-l10n mythes-en-us ncurses-term net-tools ntfs-3g p7zip-full pavucontrol-qt pavucontrol-qt-l10n pcmanfm-qt-l10n policykit-1 psmisc qlipper qpdfview qpdfview-djvu-plugin qpdfview-ps-plugin qpdfview-translations qt5-gtk-platformtheme qt5-image-formats-plugins qterminal qterminal-l10n qttranslations5-l10n rename rsync rtkit saytime ssh sudo unzip upower wget wpasupplicant xdg-user-dirs xdg-utils xz-utils youtube-dl"
 KALI_PACKAGES="${KALI_KALI} ${KALI_GENERIC}"
 GEMIAN_PACKAGES="hybris-usb lxc-android libhybris drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid libpulse0 pulseaudio ofono repowerd xss-lock gemian-lock gemian-leds cmst connman-plugin-suspend-wmtwifi"
 ## End customising
@@ -430,11 +430,11 @@ groupadd -g 3002 aid_net_bt
 groupadd -g 3003 aid_inet
 groupadd -g 3004 aid_inet_raw
 groupadd -g 3005 aid_inet_admin
-groupadd -g 100000 gemini
+groupadd -g 100000 kali
 
-useradd -m -u 100000 -g 100000 -G audio,video,sudo,aid_system,aid_graphics,aid_input,aid_audio,aid_net_bt_admin,aid_net_bt,aid_inet,aid_inet_raw,aid_inet_admin -s /bin/bash gemini
+useradd -m -u 100000 -g 100000 -G audio,video,sudo,aid_system,aid_graphics,aid_input,aid_audio,aid_net_bt_admin,aid_net_bt,aid_inet,aid_inet_raw,aid_inet_admin -s /bin/bash kali
 
-echo "gemini:gemini" | chpasswd
+echo "kali:kali" | chpasswd
 echo "root:toor" | chpasswd
 
 ln -sf ../lib/systemd/systemd /sbin/init
@@ -443,6 +443,7 @@ ln -sf ../lib/systemd/systemd /sbin/init
 mkdir -p /usr/lib/chromium
 ln -sf /usr/lib/aarch64-linux-gnu/libhybris-egl/libEGL.so.1.0.0 /usr/lib/chromium/libEGL.so
 ln -sf /usr/lib/aarch64-linux-gnu/libhybris-egl/libGLESv2.so.2.0.0 /usr/lib/chromium/libGLESv2.so
+
 
 echo 'LANG="en_US.UTF-8"\n' > /etc/default/locale
 
