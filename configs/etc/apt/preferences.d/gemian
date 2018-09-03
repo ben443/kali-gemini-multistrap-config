@@ -14,86 +14,6 @@ Package: connman
 Pin: release n=kali-rolling
 Pin-Priority: -10
 
-Package: drihybris
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: drihybris
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: gemian-leds
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: gemian-leds
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: gemian-lock
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: gemian-lock
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: glamor-hybris
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: glamor-hybris
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: libandroid-properties1
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: libandroid-properties1
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: libglibutil
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: libglibutil
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: libgrilio
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: libgrilio
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: libhardware2
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: libhardware2
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: libhybris
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: libhybris
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: libhybris-common1
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: libhybris-common1
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
 Package: liblxqt-globalkeys-ui0
 Pin: origin "gemian.thinkglobally.org"
 Pin-Priority: 900
@@ -107,22 +27,6 @@ Pin: origin "gemian.thinkglobally.org"
 Pin-Priority: 900
 
 Package: liblxqt-globalkeys0
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: libmce-glib
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: libmce-glib
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: libmedia1
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: libmedia1
 Pin: release n=kali-rolling
 Pin-Priority: -10
 
@@ -254,22 +158,6 @@ Package: libqt5xml5
 Pin: release n=kali-rolling
 Pin-Priority: -10
 
-Package: libwspcodec
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: libwspcodec
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: lxc-android
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: lxc-android
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
 Package: lxqt-globalkeys
 Pin: origin "gemian.thinkglobally.org"
 Pin-Priority: 900
@@ -350,34 +238,10 @@ Package: qt5-gtk-platformtheme
 Pin: release n=kali-rolling
 Pin-Priority: -10
 
-Package: repowerd
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: repowerd
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: repowerd-data
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: repowerd-data
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
 Package: xkb-data
 Pin: origin "gemian.thinkglobally.org"
 Pin-Priority: 900
 
 Package: xkb-data
-Pin: release n=kali-rolling
-Pin-Priority: -10
-
-Package: xserver-xorg-video-hwcomposer
-Pin: origin "gemian.thinkglobally.org"
-Pin-Priority: 900
-
-Package: xserver-xorg-video-hwcomposer
 Pin: release n=kali-rolling
 Pin-Priority: -10
