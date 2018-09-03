@@ -1,15 +1,15 @@
 Package: sddm
-Pin: release a=kali-rolling
+Pin: release n=kali-rolling
 Pin-Priority: 900
 
 Package: sddm
-Pin: release a=buster
+Pin: origin "gemian.thinkglobally.org"
 Pin-Priority: -10
 
 Package: sddm-theme-debian-elarun
-Pin: release a=kali-rolling
+Pin: release n=kali-rolling
 Pin-Priority: 900
 
 Package: sddm-theme-debian-elarun
-Pin: release a=buster
+Pin: origin "gemian.thinkglobally.org"
 Pin-Priority: -10
