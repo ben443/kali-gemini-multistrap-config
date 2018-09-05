@@ -3,6 +3,9 @@
 # kali-gemini-multistrap-config
 Configs and scripts used to create a Kali Linux rootfs for Gemini PDA
 
+## Status
+This project is current an unsupported "Technology Preview", i.e. it is a fully working prototype but not ready for series production as the efforts required for maintenance and support is not sustainable. 
+
 ## Prerequisites
 ```
 mkdir gemini && cd gemini
