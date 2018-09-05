@@ -18,6 +18,7 @@ sudo apt install libncurses5-dev libncursesw5-dev curl multistrap
 ## Install qemu-aarch64-static from buster
 git clone https://github.com/osm0sis/mkbootimg.git
 make -C mkbootimg
+cd ..
 mkdir RAMDISK && cd RAMDISK
 curl -O https://gemian.thinkglobally.org/ramdisk.cpio.gz 
 cd ..
