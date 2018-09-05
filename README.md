@@ -1,3 +1,5 @@
+![](https://re4son-kernel.com/wp-content/uploads/Kali-Gem-sddm.jpg)  
+
 # kali-gemini-multistrap-config
 Configs and scripts used to create a Kali Linux rootfs for Gemini PDA
 
@@ -24,3 +26,6 @@ Customise the first section of "build-*-gemini.sh"
 ```
 sudo ./build-*-gemini.sh
 ```
+  
+## Wiki
+More information can be found in the [wiki](https://github.com/Re4son/kali-gemini-multistrap-config/wiki)
