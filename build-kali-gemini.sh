@@ -11,11 +11,11 @@ DEBUG=1
 #                         1=Execute
 #                         2=Ask )
 PURGE=2
-PURGEKERNEL=2
+PURGEKERNEL=0
 CLEANUP=2
 PREPARE=2
-COMPILEKERNEL=2
-PKGKERNEL=2
+COMPILEKERNEL=0
+PKGKERNEL=0
 WRITEMULTISTRAPCFG=2
 MULTISTRAP=2
 ADDKERNELMODS=2
@@ -27,14 +27,14 @@ POSTSETUP=2
 REMOVEQEMU=2
 PREPAREIMG=2
 CREATEIMG=2
-ARCHIVEKERNEL=2
+ARCHIVEKERNEL=0
 ARCHIVEROOTFS=2
 
 # Packages to install
 KALI_KALI="kali-defaults kali-menu desktop-base kali-linux-top10 kali-root-login firmware-realtek firmware-atheros firmware-libertas"
 KALI_GENERIC="task-lxqt-desktop ark bash-completion bluez breeze bzip2 dosfstools exfat-utils file firefox-esr fonts-hack-ttf fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-mono gdisk gstreamer1.0-plugins-base gtk3-engines-breeze gvfs-backends hunspell-en-us hyphen-en-us isc-dhcp-common iw kate kcharselect kde-style-breeze-qt4 kdelibs5-data kpackagelauncherqml kwin-x11 libfm-qt-l10n libglib2.0-data libkf5config-bin libkf5dbusaddons-bin libkf5globalaccel-bin libkf5iconthemes-bin libkf5xmlgui-bin liblxqt-l10n libvlc-bin locales lxc lximage-qt lximage-qt-l10n lxqt-about-l10n lxqt-admin-l10n lxqt-config-l10n lxqt-globalkeys-l10n lxqt-notificationd-l10n lxqt-openssh-askpass-l10n lxqt-panel-l10n lxqt-policykit-l10n lxqt-powermanagement-l10n lxqt-runner-l10n lxqt-session-l10n lxqt-sudo lxqt-sudo-l10n mythes-en-us ncurses-term net-tools ntfs-3g p7zip-full pavucontrol-qt pavucontrol-qt-l10n pcmanfm-qt-l10n policykit-1 psmisc qlipper qpdfview qpdfview-djvu-plugin qpdfview-ps-plugin qpdfview-translations qt5-gtk-platformtheme qt5-image-formats-plugins qterminal qterminal-l10n qttranslations5-l10n rename rsync rtkit saytime ssh sudo unzip upower wget wpasupplicant xdg-user-dirs xdg-utils xz-utils youtube-dl"
 KALI_PACKAGES="${KALI_KALI} ${KALI_GENERIC}"
-GEMIAN_PACKAGES="hybris-usb lxc-android libhybris drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid libpulse0 pulseaudio ofono repowerd xss-lock gemian-lock gemian-leds cmst connman-plugin-suspend-wmtwifi"
+GEMINI_PACKAGES="hybris-usb lxc-android libhybris drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid libpulse0 pulseaudio ofono repowerd xss-lock gemian-lock gemian-leds cmst connman-plugin-suspend-wmtwifi"
 ## End customising
 
 
@@ -259,13 +259,13 @@ multiarch=
 # aptsources is a list of sections to be used
 # the /etc/apt/sources.list.d/multistrap.sources.list
 # of the target. Order is not important
-aptsources=Kali Gemian
+aptsources=Kali Gemini
 aptpreferences=$APTPREFERENCES
 # the bootstrap option determines which repository
 # is used to calculate the list of Priority: required packages
 # and which packages go into the rootfs.
 # The order of sections is not important.
-bootstrap=Kali Gemian
+bootstrap=Kali Gemini
 
 [Kali]
 packages=$KALI_PACKAGES
@@ -274,10 +274,10 @@ keyring=kali-archive-keyring
 suite=kali-rolling
 components=main contrib non-free
 
-[Gemian]
-packages=$GEMIAN_PACKAGES
-source=http://gemian.thinkglobally.org/buster/
-suite=buster
+[Gemini]
+packages=$GEMINI_PACKAGES
+source=http://http.re4son-kernel.com/re4son/
+suite=kali-gem
 components=main
 EOF
     chown $SUDO_USER:$SUDO_USER ${DIR_NAME}/$CONFIG
@@ -404,7 +404,7 @@ systemctl enable gemini-lights
 
 
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
-wget -O - http://gemian.thinkglobally.org/archive-key.asc | sudo apt-key add -
+wget -O - http://http.re4son-kernel.com/archive-key.asc | sudo apt-key add -
 
 # Fix dhcp client bug
 touch /etc/fstab
@@ -482,6 +482,7 @@ function do_postsetup {
     ${POSTSETUP_SCRIPT} $ROOTFS
     cp ${ROOTFS_CONFIG_SCRIPT} $ROOTFS/config.sh
     DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true LC_ALL=C LANGUAGE=C LANG=C chroot $ROOTFS /config.sh
+    rm $ROOTFS/etc/apt/preferences.d/preferences
     rm $ROOTFS/config.sh
 
     cp ${SYS_IMG} $ROOTFS/data/
@@ -553,7 +554,9 @@ if [ $DEBUG == 1 ]; then
     do_print_vars
 fi
 
-if ask "Purge files from previous builds?" "Y"; then
+if ([ $PURGE == 1 ] || [ $PURGEKERNEL == 1 ] || [ $CLEANUP == 1 ]) || \
+  (([ $PURGE == 2 ] || [ $PURGEKERNEL == 2 ] || [ $CLEANUP == 2 ]) && \
+  ask "Purge files from previous builds?" "Y"); then
     if [ $PURGE == 1 ] || ([ $PURGE == 2 ] && ask "  - Delete rootfs from previous builds?" "Y"); then
         do_purge
     fi
@@ -564,7 +567,9 @@ if ask "Purge files from previous builds?" "Y"; then
         do_cleanup
     fi
 fi
-if ask "Create build environment?" "Y"; then
+if ([ $PREPARE == 1 ] || [ $WRITEAPTPREF == 1 ] || [ $WRITEPOSTSETUP  == 1 ] || [ $WRITEROOTFSCFG  == 1 ]) || \
+  (([ $PREPARE == 2 ] || [ $WRITEAPTPREF == 2 ] || [ $WRITEPOSTSETUP  == 2 ] || [ $WRITEROOTFSCFG  == 2 ]) && \
+  ask "Create build environment?" "Y"); then
     if [ $PREPARE == 1 ] || ([ $PREPARE == 2 ] && ask "  - Prepare build environment?" "Y"); then
         do_prepare
     fi
@@ -581,7 +586,9 @@ if ask "Create build environment?" "Y"; then
         write_rootfs_config_script
     fi
 fi
-if ask "Compile custom kernel?" "Y"; then
+if ([ $COMPILEKERNEL == 1 ] || [ $PKGKERNEL == 1 ] || [ $ARCHIVEKERNEL == 1 ]) || \
+  (([ $COMPILEKERNEL == 2 ] || [ $PKGKERNEL == 2 ] || [ $ARCHIVEKERNEL == 2 ]) && \
+  ask "Compile custom kernel?" "Y"); then
     if [ $COMPILEKERNEL == 1 ] || ([ $COMPILEKERNEL == 2 ] && ask "  - Compile kernel?" "Y"); then
         do_compile_kernel
     fi
@@ -592,7 +599,9 @@ if ask "Compile custom kernel?" "Y"; then
         do_archive_kernel
     fi
 fi
-if ask "Create rootfs?" "Y"; then
+if ([ $MULTISTRAP == 1 ] || [ $ARCHIVEROOTFS == 1 ] || [ $ADDQEMU  == 1 ] || [ $ADDKERNELMODS  == 1 ] || [ $POSTSETUP  == 1 ] || [ $REMOVEQEMU  == 1 ]) || \
+  (([ $MULTISTRAP == 2 ] || [ $ARCHIVEROOTFS == 2 ] || [ $ADDQEMU  == 2 ] || [ $ADDKERNELMODS  == 2 ] || [ $POSTSETUP  == 2 ] || [ $REMOVEQEMU  == 2 ]) && \
+  ask "Create rootfs?" "Y"); then
     if [ $MULTISTRAP == 1 ] || ([ $MULTISTRAP == 2 ] && ask "  - Run multistrap to create rootfs?" "Y"); then
         do_multistrap
     fi
@@ -612,7 +621,9 @@ if ask "Create rootfs?" "Y"; then
         do_remove_qemu
     fi
 fi
-if ask "Create image?" "Y"; then
+if ([ $PREPAREIMG == 1 ] || [ $CREATEIMG == 1 ]) || \
+  (([ $PREPAREIMG == 2 ] || [ $CREATEIMG == 2 ]) && \
+  ask "Create image?" "Y"); then
     if [ $PREPAREIMG == 1 ] || ([ $PREPAREIMG == 2 ] && ask "  - Prepare image?" "Y"); then
         do_prepare_img
     fi
@@ -620,14 +631,16 @@ if ask "Create image?" "Y"; then
         do_create_img
     fi
 fi
-if ask "Purge temporary files from this build?" "Y"; then
-    if [ $PURGE == 1 ] || ([ $PURGE == 2 ] && ask "  - Delete rootfs from previous build?" "Y"); then
+if ([ $PURGE == 1 ] || [ $PURGEKERNEL == 1 ] || [ $CLEANUP == 1 ]) || \
+  (([ $PURGE == 2 ] || [ $PURGEKERNEL == 2 ] || [ $CLEANUP == 2 ]) && \
+  ask "Purge files from previous builds?" "Y"); then
+    if [ $PURGE == 1 ] || ([ $PURGE == 2 ] && ask "  - Delete rootfs from previous builds?" "Y"); then
         do_purge
     fi
     if [ $PURGEKERNEL == 1 ] || ([ $PURGEKERNEL == 2 ] && ask "  - Delete kernels from previous builds?" "Y"); then
         do_purgekernel
     fi
-    if [ $CLEANUP == 1 ] || ([ $CLEANUP == 2 ] && ask "  - Delete configuration files from previous build?" "Y"); then
+    if [ $CLEANUP == 1 ] || ([ $CLEANUP == 2 ] && ask "  - Delete configuration files from previous builds?" "Y"); then
         do_cleanup
     fi
 fi
