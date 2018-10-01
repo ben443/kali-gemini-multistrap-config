@@ -1,5 +1,5 @@
 Package: cmst
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: cmst
@@ -7,7 +7,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: connman
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: connman
@@ -15,7 +15,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: liblxqt-globalkeys-ui0
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: liblxqt-globalkeys-ui0
@@ -23,7 +23,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: liblxqt-globalkeys0
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: liblxqt-globalkeys0
@@ -31,7 +31,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libpulse-mainloop-glib0
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libpulse-mainloop-glib0
@@ -39,7 +39,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libpulse0
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libpulse0
@@ -47,7 +47,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libpulsedsp
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libpulsedsp
@@ -55,7 +55,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5concurrent5
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5concurrent5
@@ -63,7 +63,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5core5a
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5core5a
@@ -71,7 +71,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5dbus5
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5dbus5
@@ -79,7 +79,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5gui5
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5gui5
@@ -87,7 +87,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5network5
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5network5
@@ -95,7 +95,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5printsupport5
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5printsupport5
@@ -103,7 +103,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5qml5
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5qml5
@@ -111,7 +111,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5quick5
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5quick5
@@ -119,7 +119,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5quickwidgets5
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5quickwidgets5
@@ -127,7 +127,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5sql5
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5sql5
@@ -135,7 +135,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5sql5-sqlite
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5sql5-sqlite
@@ -143,7 +143,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5widgets5
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5widgets5
@@ -151,7 +151,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: libqt5xml5
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: libqt5xml5
@@ -159,7 +159,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: lxqt-globalkeys
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: lxqt-globalkeys
@@ -167,7 +167,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: ofono
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: ofono
@@ -175,7 +175,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: pulseaudio
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: pulseaudio
@@ -183,7 +183,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: pulseaudio-module-droid
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: pulseaudio-module-droid
@@ -191,7 +191,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: pulseaudio-utils
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: pulseaudio-utils
@@ -199,7 +199,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: qml-module-qtqml-models2
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: qml-module-qtqml-models2
@@ -207,7 +207,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: qml-module-qtquick-layouts
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: qml-module-qtquick-layouts
@@ -215,7 +215,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: qml-module-qtquick-window2
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: qml-module-qtquick-window2
@@ -223,7 +223,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: qml-module-qtquick2
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: qml-module-qtquick2
@@ -231,7 +231,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: qt5-gtk-platformtheme
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: qt5-gtk-platformtheme
@@ -239,7 +239,7 @@ Pin: release n=kali-rolling
 Pin-Priority: -10
 
 Package: xkb-data
-Pin: release n=kali-gem
+Pin: release n=kali-gem-experimental
 Pin-Priority: 900
 
 Package: xkb-data

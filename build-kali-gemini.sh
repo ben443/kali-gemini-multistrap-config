@@ -277,7 +277,7 @@ components=main contrib non-free
 [Gemini]
 packages=$GEMINI_PACKAGES
 source=http://http.re4son-kernel.com/re4son/
-suite=kali-gem
+suite=kali-gem-experimental
 components=main
 EOF
     chown $SUDO_USER:$SUDO_USER ${DIR_NAME}/$CONFIG
