@@ -1,6 +1,6 @@
 #!/bin/bash
 ## Customise this:
-KERNEL_VER=8
+KERNEL_VER=9
 SUITE=kali
 HOSTNAME=kali
 SYS_IMG_FILE=system.img
@@ -18,7 +18,7 @@ COMPILEKERNEL=0
 PKGKERNEL=0
 WRITEMULTISTRAPCFG=2
 MULTISTRAP=2
-ADDKERNELMODS=2
+ADDKERNELMODS=0
 ADDQEMU=2
 WRITEPOSTSETUP=2
 WRITEROOTFSCFG=2
@@ -34,7 +34,7 @@ ARCHIVEROOTFS=2
 KALI_KALI="kali-defaults kali-menu desktop-base kali-linux-top10 kali-root-login firmware-realtek firmware-atheros firmware-libertas"
 KALI_GENERIC="task-lxqt-desktop ark bash-completion bluez breeze bzip2 dosfstools exfat-utils file firefox-esr fonts-hack-ttf fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-mono gdisk gstreamer1.0-plugins-base gtk3-engines-breeze gvfs-backends hunspell-en-us hyphen-en-us isc-dhcp-common iw kate kcharselect kde-style-breeze-qt4 kdelibs5-data kpackagelauncherqml kwin-x11 libfm-qt-l10n libglib2.0-data libkf5config-bin libkf5dbusaddons-bin libkf5globalaccel-bin libkf5iconthemes-bin libkf5xmlgui-bin liblxqt-l10n libvlc-bin locales lxc lximage-qt lximage-qt-l10n lxqt-about-l10n lxqt-admin-l10n lxqt-config-l10n lxqt-globalkeys-l10n lxqt-notificationd-l10n lxqt-openssh-askpass-l10n lxqt-panel-l10n lxqt-policykit-l10n lxqt-powermanagement-l10n lxqt-runner-l10n lxqt-session-l10n lxqt-sudo lxqt-sudo-l10n mythes-en-us ncurses-term net-tools ntfs-3g p7zip-full pavucontrol-qt pavucontrol-qt-l10n pcmanfm-qt-l10n policykit-1 psmisc qlipper qpdfview qpdfview-djvu-plugin qpdfview-ps-plugin qpdfview-translations qt5-gtk-platformtheme qt5-image-formats-plugins qterminal qterminal-l10n qttranslations5-l10n rename rsync rtkit saytime ssh sudo unzip upower wget wpasupplicant xdg-user-dirs xdg-utils xz-utils youtube-dl"
 KALI_PACKAGES="${KALI_KALI} ${KALI_GENERIC}"
-GEMINI_PACKAGES="hybris-usb lxc-android libhybris drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid libpulse0 pulseaudio ofono repowerd xss-lock gemian-lock gemian-leds cmst connman-plugin-suspend-wmtwifi"
+GEMINI_PACKAGES="kali-gemini-linux kali-gemini-hw hybris-usb lxc-android libhybris drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid libpulse0 pulseaudio ofono repowerd xss-lock gemian-lock gemian-leds cmst connman-plugin-suspend-wmtwifi"
 ## End customising
 
 
@@ -210,16 +210,16 @@ function do_package_kernel {
     --pagesize 2048 \
     -o $OUT_DIR/linux_boot.img
 
-    chown $SUDO_USER:$SUDO_USER OUT_DIR/linux_boot.img
+    chown $SUDO_USER:$SUDO_USER $OUT_DIR/linux_boot.img
 
     cp $KERNEL_OUT/.config $OUT_DIR
-    chown $SUDO_USER:$SUDO_USER OUT_DIR/.config
+    chown $SUDO_USER:$SUDO_USER $OUT_DIR/.config
 
     make O=$KERNEL_OUT -C $KERNEL_SRC ARCH=arm64  CROSS_COMPILE=$CROSS_COMPILER -j${NUM_CPUS} INSTALL_MOD_PATH=$MODULES_OUT modules_install
     rm $MODULES_OUT/lib/modules/3.18.41-kali+/build
     rm $MODULES_OUT/lib/modules/3.18.41-kali+/source
-    tar -C $MODULES_OUT -I pxz -cf $OUT_DIR/modules-3.18.41-kali#$KERNEL_VER.tar.xz lib
-    chown $SUDO_USER:$SUDO_USER $OUT_DIR/modules-3.18.41-kali#$KERNEL_VER.tar.xz
+    tar -C $MODULES_OUT -czf $OUT_DIR/kali-gemini-linux-3.18.41.$KERNEL_VER.tar.gz lib
+    chown $SUDO_USER:$SUDO_USER $OUT_DIR/kali-gemini-linux-3.18.41.$KERNEL_VER.tar.gz
 }
     
 function do_archive_kernel {
@@ -351,6 +351,7 @@ mkdir -p /var/log/samba
 mkdir -p /var/cache/samba
 
 /var/lib/dpkg/info/dash.preinst install
+/var/lib/dpkg/info/kali-gemini-hw.preinst install
 dpkg --configure -a
 
 mkdir /nvcfg
@@ -477,8 +478,8 @@ function write_aptpreferences {
 
 function do_postsetup {
     printf "\t*****     Running post configuration scripts in rootfs\n"
-    cp -rv configs/* $ROOTFS
-    cp -rv configs/etc/skel/.config $ROOTFS/root/
+    ##cp -rv configs/* $ROOTFS
+    cp -rv $ROOTFS/etc/skel/.config $ROOTFS/root/
     ${POSTSETUP_SCRIPT} $ROOTFS
     cp ${ROOTFS_CONFIG_SCRIPT} $ROOTFS/config.sh
     DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true LC_ALL=C LANGUAGE=C LANG=C chroot $ROOTFS /config.sh
@@ -517,7 +518,7 @@ function do_create_img {
         mkdir -p ${TMP_MNT}
     fi
     mount -o loop,rw,sync ${ROOT_IMG} ${TMP_MNT}
-    rsync --progress -a ${ROOTFS}/* ${TMP_MNT}
+    rsync -av ${ROOTFS}/* ${TMP_MNT}
     umount ${TMP_MNT}
 }
 
