@@ -371,6 +371,7 @@ systemctl enable lxc@android.service
 systemctl enable connman.service
 systemctl enable gemian-leds
 systemctl enable bluetooth
+systemctl enable repowerd
 
 systemctl disable isc-dhcp-server.service  isc-dhcp-server6.service lxc-net.service ureadahead.service systemd-modules-load.service
 systemctl disable connman-wait-online.service
