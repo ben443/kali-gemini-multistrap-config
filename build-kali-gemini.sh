@@ -354,6 +354,13 @@ mkdir -p /var/cache/samba
 /var/lib/dpkg/info/kali-hw-gemini.preinst install
 dpkg --configure -a
 
+# sddm-breeze-theme may not be installed properly
+# This will stuff up the proper kali theming
+# Let's create a link to the existing debian theme if necessary
+if [ ! -e /usr/share/sddm/themes/breeze ]; then
+	ln -s /etc/alternatives/sddm-debian-theme /usr/share/sddm/themes/breeze
+fi
+
 mkdir /nvcfg
 mkdir /nvdata
 mkdir /system
