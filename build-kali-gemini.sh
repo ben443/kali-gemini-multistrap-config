@@ -351,7 +351,7 @@ mkdir -p /var/log/samba
 mkdir -p /var/cache/samba
 
 /var/lib/dpkg/info/dash.preinst install
-/var/lib/dpkg/info/kali-gemini-hw.preinst install
+/var/lib/dpkg/info/kali-hw-gemini.preinst install
 dpkg --configure -a
 
 mkdir /nvcfg
