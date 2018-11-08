@@ -350,6 +350,8 @@ mkdir -p /var/log/apache2
 mkdir -p /var/log/samba
 mkdir -p /var/cache/samba
 
+## Multistrap only extracted the packages and didn't run any
+## preinst scripts so lets run them now
 /var/lib/dpkg/info/dash.preinst install
 /var/lib/dpkg/info/kali-hw-gemini.preinst install
 dpkg --configure -a
@@ -419,9 +421,10 @@ wget -O - http://http.re4son-kernel.com/archive-key.asc | sudo apt-key add -
 touch /etc/fstab
 
 update-alternatives --set aarch64-linux-gnu_egl_conf /usr/lib/aarch64-linux-gnu/libhybris-egl/ld.so.conf
-mkdir /usr/lib/aarch64-linux-gnu/mesa-egl
-mv /usr/lib/aarch64-linux-gnu/libGLESv* /usr/lib/aarch64-linux-gnu/libEGL.so* /usr/lib/aarch64-linux-gnu/mesa-egl
 
+## mkdir /usr/lib/aarch64-linux-gnu/mesa-egl
+## mv /usr/lib/aarch64-linux-gnu/libGLESv* /usr/lib/aarch64-linux-gnu/libEGL.so* /usr/lib/aarch64-linux-gnu/mesa-egl
+ln -s /usr/lib/aarch64-linux-gnu/libhybris-egl/ld.so.conf /etc/ld.so.conf.d/01_libhybris-egl.conf
 ldconfig
 
 # PulseAudio
