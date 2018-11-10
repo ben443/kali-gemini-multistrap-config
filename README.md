@@ -32,3 +32,4 @@ sudo ./build-*-gemini.sh
   
 ## Wiki
 More information can be found in the [wiki](https://github.com/Re4son/kali-gemini-multistrap-config/wiki)
+![](https://github.com/Re4son/kali-gemini-multistrap-config/raw/pictures/2018.11-Kali-Gem-2_medium.jpg)
