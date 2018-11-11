@@ -391,7 +391,7 @@ Description=Resize filesystem
 After=local-fs.target
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c "sudo resize2fs -p \$(findmnt -n -o SOURCE /)"
+ExecStart=/bin/sh -c "resize2fs -p \$(findmnt -n -o SOURCE /)"
 ExecStartPost=/bin/systemctl disable resizefs
 [Install]
 WantedBy=multi-user.target
