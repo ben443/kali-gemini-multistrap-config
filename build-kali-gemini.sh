@@ -341,6 +341,7 @@ EOF
 
 function write_rootfs_config_script {
     printf "\t*****     Generating post configuration script\n"
+    AUTODETECT='\$(findmnt -n -o SOURCE /)'
     cat > ${ROOTFS_CONFIG_SCRIPT} <<EOF
 #!/bin/sh
 groupadd -g 1010 mysql
@@ -391,7 +392,7 @@ Description=Resize filesystem
 After=local-fs.target
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c "resize2fs -p \$(findmnt -n -o SOURCE /)"
+ExecStart=/bin/sh -c "resize2fs -p ${AUTODETECT}"
 ExecStartPost=/bin/systemctl disable resizefs
 [Install]
 WantedBy=multi-user.target
