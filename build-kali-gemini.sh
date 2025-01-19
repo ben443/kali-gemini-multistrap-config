@@ -37,6 +37,10 @@ KALI_PACKAGES="${KALI_KALI} ${KALI_GENERIC}"
 GEMINI_PACKAGES="kali-gemini-linux kali-hw-gemini hybris-usb lxc-android libhybris drihybris glamor-hybris xserver-xorg-video-hwcomposer pulseaudio-module-droid libpulse0 pulseaudio ofono repowerd[...]"
 ## End customising
 
+# Add missing GPG keys
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 11764EE8AC24832F
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ED444FF07D8D0BF6
+
 
 PROG_NAME="$0"
 CURRENT_DATE=`date +%Y%m%d`
