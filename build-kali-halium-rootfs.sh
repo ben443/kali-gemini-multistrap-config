@@ -23,6 +23,12 @@ cleanup() {
         umount -R "${ROOTFS}/dev" || true
         umount "${ROOTFS}/proc" || true
         umount "${ROOTFS}/sys" || true
+        if mountpoint -q "${ROOTFS}/dev" ||
+           mountpoint -q "${ROOTFS}/proc" ||
+           mountpoint -q "${ROOTFS}/sys"; then
+            echo "Rootfs mounts remain active; leaving build directory at $WORK_ROOT." >&2
+            return
+        fi
     fi
     if [[ -n "$WORK_ROOT" && -d "$WORK_ROOT" ]]; then
         rm -rf -- "$WORK_ROOT"
@@ -40,7 +46,7 @@ if [[ "$EUID" -ne 0 ]]; then
     exit 1
 fi
 
-for command in debootstrap chroot mount umount tar; do
+for command in debootstrap chroot mount umount mountpoint tar; do
     if ! command -v "$command" >/dev/null 2>&1; then
         echo "Required command not found: $command" >&2
         exit 1
