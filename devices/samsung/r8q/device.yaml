@@ -1,0 +1,28 @@
+device:
+  vendor: samsung
+  codename: r8q
+  model: SM-G781B
+  soc: SM8250
+  architecture: arm64
+  form_factor: phone
+
+android:
+  release: 11
+  api_level: 30
+
+halium:
+  branch: halium-11.0
+  status: candidate
+
+droidian:
+  vendor: samsung
+  device: r8q
+  architecture: arm64
+  api_level: 30
+  form_factor: phone
+
+sources:
+  device_tree: null
+  common_device_tree: null
+  kernel: null
+  vendor_blobs: null
