@@ -70,9 +70,9 @@ make "${make_args[@]}" "$KERNEL_DEFCONFIG"
 make "${make_args[@]}" olddefconfig
 
 while IFS= read -r option; do
-    [[ -z "$option" || "$option" == \#* ]] && continue
+    [[ -z "$option" ]] && continue
     if ! grep -Fxq "$option" "${KERNEL_OUT}/.config"; then
-        echo "Kernel config did not enable required Halium option: $option" >&2
+        echo "Kernel config does not satisfy Halium requirement: $option" >&2
         exit 1
     fi
 done < "${SCRIPT_DIR}/kernel/halium.config"
