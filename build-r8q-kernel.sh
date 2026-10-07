@@ -86,6 +86,14 @@ if grep -Eq 'found [1-9][0-9]* errors that I did not fix\.' <<< "$checker_output
     exit 1
 fi
 
+while IFS= read -r option; do
+    [[ -z "$option" ]] && continue
+    if ! grep -Fxq "$option" "${KERNEL_OUT}/.config"; then
+        echo "Kernel config does not satisfy Halium requirement: $option" >&2
+        exit 1
+    fi
+done < "${SCRIPT_DIR}/kernel/halium.config"
+
 make "${make_args[@]}" -j"$KERNEL_JOBS" Image.gz dtbs modules
 
 printf 'Kernel build output: %s\n' "$KERNEL_OUT"

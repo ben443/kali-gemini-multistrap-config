@@ -59,9 +59,9 @@ KERNEL_CROSS_COMPILE=/path/to/aarch64-linux-android- \
 
 Set `KERNEL_CC`, `KERNEL_LLVM`, `KERNEL_JOBS`, or `KERNEL_OUT` when the kernel
 source requires different build settings. `HALIUM_CHECKER` must point to an
-executable Halium-11-compatible `check-kernel-config`; the script merges
-`kernel/halium.config`, runs `olddefconfig`, validates the full Halium config
-contract, and builds `Image.gz`, DTBs, and modules.
+executable Halium-11-compatible `check-kernel-config`. The script merges
+`kernel/halium.config`, runs `olddefconfig`, checks the full Halium config
+contract and the checker result, then builds `Image.gz`, DTBs, and modules.
 
 ## Build Halium images
 
