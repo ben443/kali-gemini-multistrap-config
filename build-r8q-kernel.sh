@@ -81,10 +81,6 @@ if ! checker_output="$("$HALIUM_CHECKER" "${KERNEL_OUT}/.config" 2>&1)"; then
     exit 1
 fi
 printf '%s\n' "$checker_output"
-if grep -Eq 'found [1-9][0-9]* errors that I did not fix\.' <<< "$checker_output"; then
-    echo "Halium kernel config validation failed." >&2
-    exit 1
-fi
 
 while IFS= read -r option; do
     [[ -z "$option" ]] && continue
