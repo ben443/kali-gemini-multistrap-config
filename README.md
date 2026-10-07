@@ -51,18 +51,18 @@ variant**, not another `r8q` SKU. The source tree and toolchain are not
 downloaded or guessed by this repository.
 
 ```sh
+HALIUM_CHECKER=/path/to/halium-11/check-kernel-config \
 KERNEL_CROSS_COMPILE=/path/to/aarch64-linux-android- \
   ./build-r8q-kernel.sh /path/to/android_kernel_samsung_sm8250 \
   vendor/r8q_eur_open_defconfig
 ```
 
 Set `KERNEL_CC`, `KERNEL_LLVM`, `KERNEL_JOBS`, or `KERNEL_OUT` when the kernel
-source requires different build settings. The script merges
-`kernel/halium.config`, runs `olddefconfig`, validates its enabled, disabled,
-and exact-value settings when those symbols exist in the selected kernel, and
-builds `Image.gz`, DTBs, and modules. Check the resulting config with Halium's
-[`check-kernel-config`](https://github.com/Halium/halium-boot/blob/master/check-kernel-config)
-before using it in a Halium boot image.
+source requires different build settings. `HALIUM_CHECKER` must point to an
+executable Halium-11-compatible `check-kernel-config`; the script merges
+`kernel/halium.config`, runs `olddefconfig`, validates the full Halium contract
+with the checker and verifies fragment settings supported by the selected
+kernel, then builds `Image.gz`, DTBs, and modules.
 
 ## Build Halium images
 

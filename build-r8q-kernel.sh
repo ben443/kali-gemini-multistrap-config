@@ -10,6 +10,7 @@ KERNEL_CC="${KERNEL_CC:-clang}"
 KERNEL_CROSS_COMPILE="${KERNEL_CROSS_COMPILE:-}"
 KERNEL_LLVM="${KERNEL_LLVM:-}"
 KERNEL_JOBS="${KERNEL_JOBS:-$(nproc)}"
+HALIUM_CHECKER="${HALIUM_CHECKER:-}"
 
 usage() {
     printf 'Usage: %s <android-kernel-source> <variant-defconfig>\n' "${0##*/}"
@@ -28,6 +29,11 @@ fi
 
 if [[ -z "$KERNEL_CROSS_COMPILE" && -z "$KERNEL_LLVM" ]]; then
     echo "Set KERNEL_CROSS_COMPILE or KERNEL_LLVM for the kernel's matching toolchain." >&2
+    exit 1
+fi
+
+if [[ -z "$HALIUM_CHECKER" || ! -x "$HALIUM_CHECKER" ]]; then
+    echo "Set HALIUM_CHECKER to an executable Halium-11-compatible check-kernel-config." >&2
     exit 1
 fi
 
@@ -68,6 +74,17 @@ make "${make_args[@]}" "$KERNEL_DEFCONFIG"
     "${KERNEL_OUT}/.config" \
     "${SCRIPT_DIR}/kernel/halium.config"
 make "${make_args[@]}" olddefconfig
+
+if ! checker_output="$("$HALIUM_CHECKER" "${KERNEL_OUT}/.config" 2>&1)"; then
+    printf '%s\n' "$checker_output" >&2
+    echo "Halium kernel config validation failed." >&2
+    exit 1
+fi
+printf '%s\n' "$checker_output"
+if grep -Eq 'found [1-9][0-9]* errors that I did not fix\.' <<< "$checker_output"; then
+    echo "Halium kernel config validation failed." >&2
+    exit 1
+fi
 
 while IFS= read -r option; do
     [[ -z "$option" ]] && continue
