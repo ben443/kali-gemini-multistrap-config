@@ -70,9 +70,22 @@ make "${make_args[@]}" "$KERNEL_DEFCONFIG"
 make "${make_args[@]}" olddefconfig
 
 while IFS= read -r option; do
-    [[ -z "$option" || "$option" == \#* ]] && continue
+    [[ -z "$option" ]] && continue
+    if [[ "$option" == \#* && "$option" != \#\ CONFIG_*' is not set' ]]; then
+        continue
+    fi
+    if [[ "$option" == \#\ CONFIG_*' is not set' ]]; then
+        symbol="${option#\# }"
+        symbol="${symbol% is not set}"
+    else
+        symbol="${option%%=*}"
+    fi
+    if ! grep -Eq "^(# )?${symbol}(=| is not set$)" "${KERNEL_OUT}/.config"; then
+        echo "Skipping Halium setting unavailable in this kernel: $symbol" >&2
+        continue
+    fi
     if ! grep -Fxq "$option" "${KERNEL_OUT}/.config"; then
-        echo "Kernel config did not enable required Halium option: $option" >&2
+        echo "Kernel config does not satisfy required Halium setting: $option" >&2
         exit 1
     fi
 done < "${SCRIPT_DIR}/kernel/halium.config"
