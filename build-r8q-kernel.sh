@@ -88,10 +88,17 @@ fi
 
 while IFS= read -r option; do
     [[ -z "$option" ]] && continue
-    if ! grep -Fxq "$option" "${KERNEL_OUT}/.config"; then
-        echo "Kernel config does not satisfy Halium requirement: $option" >&2
-        exit 1
+    if grep -Fxq "$option" "${KERNEL_OUT}/.config"; then
+        continue
     fi
+    if [[ "$option" =~ ^#\ (CONFIG_[A-Za-z0-9_]+)\ is\ not\ set$ ]]; then
+        config_symbol="${BASH_REMATCH[1]}"
+        if ! grep -Eq "^${config_symbol}=" "${KERNEL_OUT}/.config"; then
+            continue
+        fi
+    fi
+    echo "Kernel config does not satisfy Halium requirement: $option" >&2
+    exit 1
 done < "${SCRIPT_DIR}/kernel/halium.config"
 
 make "${make_args[@]}" -j"$KERNEL_JOBS" Image.gz dtbs modules
