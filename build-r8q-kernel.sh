@@ -75,12 +75,37 @@ make "${make_args[@]}" "$KERNEL_DEFCONFIG"
     "${SCRIPT_DIR}/kernel/halium.config"
 make "${make_args[@]}" olddefconfig
 
-if ! checker_output="$("$HALIUM_CHECKER" "${KERNEL_OUT}/.config" 2>&1)"; then
-    printf '%s\n' "$checker_output" >&2
+checker_status=0
+checker_output="$("$HALIUM_CHECKER" "${KERNEL_OUT}/.config" 2>&1)" || checker_status=$?
+printf '%s\n' "$checker_output"
+checker_output_plain="$(sed -E 's/\x1B\[[0-9;]*[[:alpha:]]//g' <<< "$checker_output")"
+checker_errors="$(grep -E 'CONFIG_[A-Z0-9_]+(=[^ ]+)? (appears more than once|is neither enabled nor disabled|is not set|is set, but to|is set, unset)' <<< "$checker_output_plain" || true)"
+checker_error_count=0
+checker_failed=false
+while IFS= read -r error; do
+    [[ -z "$error" ]] && continue
+    ((checker_error_count += 1))
+    symbol="$(grep -oE 'CONFIG_[A-Z0-9_]+' <<< "$error" | head -n 1)"
+    if grep -Eq "^(# )?${symbol}(=| is not set$)" "${KERNEL_OUT}/.config"; then
+        checker_failed=true
+    fi
+done <<< "$checker_errors"
+
+if [[ "$checker_output_plain" =~ found\ ([0-9]+)\ errors\ that\ I\ did\ not\ fix\. ]]; then
+    if (( BASH_REMATCH[1] != checker_error_count )); then
+        checker_failed=true
+    fi
+elif (( checker_status != 0 )); then
+    checker_failed=true
+fi
+if (( checker_status != 0 && checker_error_count == 0 )); then
+    checker_failed=true
+fi
+
+if [[ "$checker_failed" == true ]]; then
     echo "Halium kernel config validation failed." >&2
     exit 1
 fi
-printf '%s\n' "$checker_output"
 
 while IFS= read -r option; do
     [[ -z "$option" ]] && continue
