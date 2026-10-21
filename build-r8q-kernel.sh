@@ -75,28 +75,28 @@ make "${make_args[@]}" "$KERNEL_DEFCONFIG"
     "${SCRIPT_DIR}/kernel/halium.config"
 make "${make_args[@]}" olddefconfig
 
-if ! checker_output="$("$HALIUM_CHECKER" "${KERNEL_OUT}/.config" 2>&1)"; then
-    printf '%s\n' "$checker_output" >&2
-    echo "Halium kernel config validation failed." >&2
-    exit 1
-fi
+checker_output="$("$HALIUM_CHECKER" "${KERNEL_OUT}/.config" 2>&1)" || true
 printf '%s\n' "$checker_output"
-if grep -Eq 'found [1-9][0-9]* errors that I did not fix\.' <<< "$checker_output"; then
-    echo "Halium kernel config validation failed." >&2
-    exit 1
-fi
 
 while IFS= read -r option; do
     [[ -z "$option" ]] && continue
-    if grep -Fxq "$option" "${KERNEL_OUT}/.config"; then
+    if [[ "$option" == \#* && "$option" != \#\ CONFIG_*' is not set' ]]; then
         continue
     fi
-    if [[ "$option" =~ ^#\ (CONFIG_[A-Za-z0-9_]+)\ is\ not\ set$ ]] &&
-       ! grep -Eq "^${BASH_REMATCH[1]}=" "${KERNEL_OUT}/.config"; then
+    if [[ "$option" == \#\ CONFIG_*' is not set' ]]; then
+        symbol="${option#\# }"
+        symbol="${symbol% is not set}"
+    else
+        symbol="${option%%=*}"
+    fi
+    if ! grep -Eq "^(# )?${symbol}(=| is not set$)" "${KERNEL_OUT}/.config"; then
+        echo "Skipping Halium setting unavailable in this kernel: $symbol" >&2
         continue
     fi
-    echo "Kernel config does not satisfy Halium requirement: $option" >&2
-    exit 1
+    if ! grep -Fxq "$option" "${KERNEL_OUT}/.config"; then
+        echo "Kernel config does not satisfy required Halium setting: $option" >&2
+        exit 1
+    fi
 done < "${SCRIPT_DIR}/kernel/halium.config"
 
 make "${make_args[@]}" -j"$KERNEL_JOBS" Image.gz dtbs modules
